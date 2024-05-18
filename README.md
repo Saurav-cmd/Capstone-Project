@@ -28,3 +28,8 @@ Add to Cart: Products can be added to the Cart
 Delete Products: User can delete their products from the cart
 Update Products: User can increase or decrease the products
 Drink Reviews and Ratings: They can give rating to the products based on their interest
+
+Drink of the day: Displays the drink of the day to the user.
+Offline access: Allows the users to have offline access to the app.
+Notification: Allows users to get notification according to their preference.
+Theme Switching: Allows users to view the app in dark mode or the normal according to their preference.
