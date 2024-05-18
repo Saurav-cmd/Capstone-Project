@@ -23,3 +23,8 @@ Favourite Management: Users can save their favourites drink.
 Search Drinks: User can search the drinks by the name of the drink.
 User Profile Management: User can edit their profile.
 Splash Screen: At the first an animated splash screen will come up.
+
+Add to Cart: Products can be added to the Cart
+Delete Products: User can delete their products from the cart
+Update Products: User can increase or decrease the products
+Drink Reviews and Ratings: They can give rating to the products based on their interest
