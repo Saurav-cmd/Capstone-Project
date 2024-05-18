@@ -5,9 +5,9 @@ College project
 Group Id: S1G9
 
 # Group Members
-Saurav Adhikari
-Gudwin Gupta
-Tashi Norbu Lama
+- Saurav Adhikari
+- Gudwin Gupta
+- Tashi Norbu Lama
 
 # Project Detail
 ## Project Name
