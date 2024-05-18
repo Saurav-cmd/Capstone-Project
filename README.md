@@ -17,6 +17,7 @@ BoozeBuddy
 BoozeBuddy is an app that helps users discover new drinks, manage their favorite beverages, and find new booze buddy partners and many more.
 
 ## Data Source
+The data for this app is sourced from Firebase. Firebase provides a real-time NoSQL database, which allows for seamless data synchronization and real-time updates. We use Firebase to store user data, drink recipes, and user interactions, ensuring a smooth and responsive experience for our users.
 
 ## Features
 Favourite Management: Users can save their favourites drink.
