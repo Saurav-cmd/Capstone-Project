@@ -22,7 +22,7 @@ The data for this app is sourced from Firebase. Firebase provides a real-time No
 ## Features
 - Favourite Management: Users can save their favourites drink.
 - Search Drinks: User can search the drinks by the name of the drink.
-- User Profile Management: User can edit their profile.
+- User Profile Management: Users can edit their profile information (name, email, phone, etc.) to personalize their experience enhance security, and ensure accurate communication.
 - Splash Screen: At the first an animated splash screen will come up.
 
 - Add to Cart: Products can be added to the Cart
