@@ -25,9 +25,9 @@ The data for this app is sourced from Firebase. Firebase provides a real-time No
 - User Profile Management: Users can edit their profile information (name, email, phone, etc.) to personalize their experience enhance security, and ensure accurate communication.
 - Splash Screen: At the first an animated splash screen will come up.
 
-- Add to Cart: Products can be added to the Cart
-- Delete Products: User can delete their products from the cart
-- Update Products: User can increase or decrease the products
+- Add to Cart: Users can add products to their cart, allowing them to compile items they intend to purchase.
+- Delete Products: Users can remove products from their cart, giving them control over their potential purchases.
+- Update Products: Users can increase or decrease the quantity of products in their cart, helping them manage their intended purchases accurately.
 - Drink Reviews and Ratings: They can give rating to the products based on their interest
 
 - Drink of the day: Displays the drink of the day to the user.
