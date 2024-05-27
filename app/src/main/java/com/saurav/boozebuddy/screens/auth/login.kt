@@ -1,5 +1,6 @@
 package com.saurav.boozebuddy.screens.auth
 
+import android.print.PrintAttributes.Margins
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -48,12 +50,19 @@ fun LoginPage() {
             ImageView()
         }
         item {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)){
             Text(
                 text = "Welcome \n Back", style = TextStyle(
-                    color = secondaryColor,
-                    fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    color = primaryColor,
+                    fontWeight = FontWeight.Bold, fontSize = 25.sp
                 )
             )
+            }
+        }
+        item { 
+            Spacer(modifier = Modifier.height(20.dp))
         }
         item {
             "Email".TextFormField()
@@ -66,8 +75,11 @@ fun LoginPage() {
         }
         item {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 contentAlignment = Alignment.CenterEnd
+
             ) {
                 Text(
                     text = "Forgot Password?",
@@ -81,7 +93,35 @@ fun LoginPage() {
             }
         }
         item {
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+        item {
+            Box(modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            )
+            {
             CustomButton()
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(40.dp))
+        }
+
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+            Text(
+                text = "Don't Have an Account? Sign Up",
+                style = TextStyle(
+                    color = secondaryColor,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textDecoration = TextDecoration.Underline
+                )
+            )
+        }
         }
 
     }
@@ -129,6 +169,7 @@ private fun String.TextFormField() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
+            .padding(horizontal = 10.dp)
             .border(width = 1.dp, color = primaryColor, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
