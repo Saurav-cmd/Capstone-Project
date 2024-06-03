@@ -1,9 +1,9 @@
 package com.saurav.boozebuddy.app_navigation
 
-sealed class NavRoute(val route: String){
-    //
+sealed class NavRoute(val route: String) {
+    object Splash : NavRoute("splash")
+    object Login : NavRoute("login")
     object Home : NavRoute("home")
-    object Detail : NavRoute("detail/{itemId}") {
-        fun createRoute(itemId: Int) = "detail/$itemId"
-    }
+    object BottomNavigation : NavRoute("bottom_navigation")
+    object ProductListing: NavRoute("product_listing")
 }

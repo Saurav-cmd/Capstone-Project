@@ -1,9 +1,9 @@
 package com.saurav.boozebuddy.screens.home
 
-import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,10 +37,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.R
+import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
@@ -49,9 +49,10 @@ data class Item(val id: Int, val text: String, val imageRes: Int)
 
 
 @Composable
-fun HomePage() {
+fun HomePage(navController: NavHostController) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
@@ -66,11 +67,10 @@ fun HomePage() {
             Spacer(modifier = Modifier.height(25.dp))
             TopBrandsLine()
             Spacer(modifier = Modifier.height(16.dp))
-            CustomGridViewPreview()
+            CustomGridViewPreview(navController)
         }
     }
 }
-
 
 
 @Composable
@@ -180,7 +180,7 @@ fun TopBrandsLine() {
 }
 
 @Composable
-fun TopBrandsGridView(items: List<Item>) {
+fun TopBrandsGridView(items: List<Item>, navController: NavHostController) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -192,7 +192,7 @@ fun TopBrandsGridView(items: List<Item>) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 rowItems.forEach { item ->
-                    GridItem(item = item)
+                    GridItem(item = item, navController)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -201,12 +201,17 @@ fun TopBrandsGridView(items: List<Item>) {
 }
 
 @Composable
-fun GridItem(item: Item) {
+fun GridItem(item: Item, navController: NavHostController) {
     Box(
         modifier = Modifier
             .width(100.dp)
             .height(100.dp)
-            .padding(8.dp).border(width = 1.dp, color = primaryColor).clip(shape = RoundedCornerShape(10.dp))
+            .padding(8.dp)
+            .border(width = 1.dp, color = primaryColor)
+            .clip(shape = RoundedCornerShape(10.dp))
+            .clickable {
+                navController.navigate(NavRoute.ProductListing.route)
+            }
     ) {
         Image(
             painter = painterResource(id = item.imageRes),
@@ -222,9 +227,9 @@ fun GridItem(item: Item) {
     }
 }
 
-@Preview
+
 @Composable
-fun CustomGridViewPreview() {
+fun CustomGridViewPreview(navController: NavHostController) {
     val items = listOf(
         Item(1, "Rum", imageRes = R.drawable.rum),
         Item(2, "Proper", imageRes = R.drawable.proper),
@@ -236,5 +241,5 @@ fun CustomGridViewPreview() {
         Item(8, "Item 8", imageRes = R.drawable.person),
         Item(9, "Item 9", imageRes = R.drawable.person),
     )
-    TopBrandsGridView(items = items)
+    TopBrandsGridView(items = items, navController)
 }

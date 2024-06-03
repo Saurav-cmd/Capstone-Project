@@ -5,7 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.saurav.boozebuddy.app_navigation.NavGraph
 import com.saurav.boozebuddy.screens.auth.LoginPage
 import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
 import com.saurav.boozebuddy.screens.home.HomePage
@@ -21,10 +24,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = bodyColor,
                 ) {
-                   BottomNavigationBarMain()
-//                    LoginPage()
+                   MyApp()
                 }
             }
         }
     }
+}
+
+@Composable
+fun MyApp() {
+    val navController = rememberNavController()
+    NavGraph.Setup(navController = navController)
 }

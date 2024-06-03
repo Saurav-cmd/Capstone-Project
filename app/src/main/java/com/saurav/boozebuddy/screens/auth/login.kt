@@ -6,11 +6,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -35,16 +38,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.R
+import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.ui.theme.bodyColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
-fun LoginPage() {
+fun LoginPage(navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.statusBars)
     ) {
         item {
             ImageView()
@@ -100,7 +106,7 @@ fun LoginPage() {
                 contentAlignment = Alignment.Center
             )
             {
-            CustomButton()
+            CustomButton(navController)
             }
         }
         item {
@@ -144,9 +150,11 @@ private fun ImageView() {
 }
 
 @Composable
-fun CustomButton() {
+fun CustomButton(navController: NavHostController) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = {
+                  navController.navigate(NavRoute.BottomNavigation.route)
+        },
         colors = ButtonDefaults.buttonColors(
             containerColor = primaryColor,
             contentColor = bodyColor

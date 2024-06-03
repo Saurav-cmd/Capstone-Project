@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.exyte.animatednavbar.AnimatedNavigationBar
 import com.exyte.animatednavbar.animation.balltrajectory.Straight
 import com.exyte.animatednavbar.animation.indendshape.Height
@@ -38,14 +39,14 @@ import com.saurav.boozebuddy.ui.theme.bottomNavUnSelectedIconColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
 
 @Composable
-fun BottomNavigationBarMain() {
-    AnimatedNavBar()
+fun BottomNavigationBarMain(navController: NavHostController) {
+    AnimatedNavBar(navController)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AnimatedNavBar() {
+private fun AnimatedNavBar(navController: NavHostController) {
     val navigationBarItems = remember { NavigationBarItems.values() }
     var selectedIndex by remember{ mutableStateOf(0) }
 
@@ -83,7 +84,7 @@ private fun AnimatedNavBar() {
     ) {
         when (selectedIndex) {
             0 -> {
-                HomePage()
+                HomePage(navController)
             }
             1 -> {
                 NotificationPage()
