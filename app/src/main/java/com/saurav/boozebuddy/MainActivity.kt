@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.saurav.boozebuddy.screens.auth.LoginPage
+import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
+import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.ui.theme.BoozeBuddyTheme
 import com.saurav.boozebuddy.ui.theme.bodyColor
 
@@ -19,8 +21,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = bodyColor,
                 ) {
-//                    HomePage()
-                    LoginPage()
+                   BottomNavigationBarMain()
+//                    LoginPage()
                 }
             }
         }
