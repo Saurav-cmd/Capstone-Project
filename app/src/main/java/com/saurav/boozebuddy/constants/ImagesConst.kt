@@ -8,4 +8,5 @@ object ImagesConst {
     var tequila: Int = R.drawable.tequila_logo
     var vodka: Int = R.drawable.vodka_logo
     var simrsOff: Int = R.drawable.simrs_off
+    var banner: Int = R.drawable.banner
 }
