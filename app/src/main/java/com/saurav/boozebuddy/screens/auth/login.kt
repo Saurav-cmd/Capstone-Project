@@ -160,7 +160,11 @@ fun CustomButton(navController: NavHostController) {
             contentColor = bodyColor
         )
     ) {
-        Text(text = "Login")
+        Text(
+            modifier = Modifier.padding(horizontal = 40.dp),
+            text = "Login",
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+        )
     }
 }
 
