@@ -1,6 +1,7 @@
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,13 +31,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.R
+import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.ui.theme.bodyColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
-fun SignupPage(){
+fun SignupPage(navController: NavHostController){
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -52,7 +55,7 @@ fun SignupPage(){
                     text = "Create \n Account", style = TextStyle(
                         color = primaryColor,
                         fontWeight = FontWeight.Bold, fontSize = 25.sp
-                    )
+                    ),
                 )
             }
         }
@@ -87,7 +90,9 @@ fun SignupPage(){
         }
         item {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().clickable {
+                    navController.popBackStack()
+                },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
