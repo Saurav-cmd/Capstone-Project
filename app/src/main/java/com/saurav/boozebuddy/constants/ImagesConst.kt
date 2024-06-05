@@ -9,4 +9,5 @@ object ImagesConst {
     var vodka: Int = R.drawable.vodka_logo
     var simrsOff: Int = R.drawable.simrs_off
     var banner: Int = R.drawable.banner
+    var people: Int = R.drawable.people
 }
