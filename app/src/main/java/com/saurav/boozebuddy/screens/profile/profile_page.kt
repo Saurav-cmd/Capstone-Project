@@ -73,11 +73,11 @@ private fun TopContainer() {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)
+                .height(180.dp)
         ) {
             val path = Path().apply {
                 moveTo(0f, size.height)
-                quadraticTo(size.width / 2, size.height - 100, size.width, size.height)
+                quadraticTo(size.width / 2, size.height - 200, size.width, size.height)
                 lineTo(size.width, 0f)
                 lineTo(0f, 0f)
                 close()
@@ -109,7 +109,7 @@ private fun TopContainer() {
                     .size(100.dp),
                 shape = CircleShape,
                 color = Color.White,
-                tonalElevation = 8.dp
+                tonalElevation = 20.dp
             ) {
                 Image(
                     painter = painterResource(id = ImagesConst.people),
@@ -121,7 +121,7 @@ private fun TopContainer() {
         }
     }
 
-    Spacer(modifier = Modifier.height(60.dp)) // Adjusted to accommodate the offset profile image
+    Spacer(modifier = Modifier.height(60.dp))
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
