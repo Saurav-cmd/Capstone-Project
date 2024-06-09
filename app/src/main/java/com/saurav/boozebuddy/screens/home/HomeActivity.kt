@@ -86,6 +86,7 @@ private fun GreetingContainer() {
                     fontWeight = FontWeight.Bold, fontSize = 16.sp
                 )
             )
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "London",
                 style = TextStyle(

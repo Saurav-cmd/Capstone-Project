@@ -3,6 +3,7 @@ package com.saurav.boozebuddy.screens.product
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,20 +37,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.saurav.boozebuddy.app_navigation.NavRoute
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Item
 import com.saurav.boozebuddy.screens.home.items
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
-fun ProductListingScreen() {
+fun ProductListingScreen(navHostController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -58,36 +64,38 @@ fun ProductListingScreen() {
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
     ){
         item {
-            TopContainer()
+            TopContainer(navHostController)
         }
         item {
             "Search".TextFormField()
             Spacer(modifier = Modifier.height(25.dp))
         }
         item {
-            ProductGridView()
+            ProductGridView(navHostController)
         }
     }
 }
 
 @Composable
-private fun TopContainer(){
+private fun TopContainer(navController: NavHostController){
     Box(
         modifier = Modifier.fillMaxWidth(),
     ){
          Icon(
              imageVector = Icons.Default.ArrowBack,
              contentDescription = "Back",
-             tint = Color.Black,
+             tint = colors.secondary,
              modifier = Modifier
                  .padding(10.dp)
                  .size(30.dp)
-                 .align(Alignment.CenterStart)
+                 .align(Alignment.CenterStart).clickable {
+                     navController.popBackStack()
+                 }
          )
 
         Text(
             text = "Products", style = TextStyle(
-                color = primaryColor, fontSize = 24.sp, fontWeight = FontWeight.Bold
+                color = colors.secondary, fontSize = 24.sp, fontWeight = FontWeight.Bold
             ),
             modifier = Modifier.align(Alignment.Center)
         )
@@ -110,10 +118,10 @@ private fun String.TextFormField() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .border(width = 1.dp, color = primaryColor, shape = RoundedCornerShape(10.dp)),
+            .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
-            textColor = secondaryColor,
+            textColor = colors.secondary,
             containerColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -123,7 +131,7 @@ private fun String.TextFormField() {
 }
 
 @Composable
-fun ProductGridView() {
+fun ProductGridView(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -142,7 +150,7 @@ fun ProductGridView() {
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        GridItem(item)
+                        GridItem(item, navController)
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
@@ -157,13 +165,17 @@ fun ProductGridView() {
 }
 
 @Composable
-fun GridItem(item: Item) {
+fun GridItem(item: Item, navHostController: NavHostController) {
     Box(
         modifier = Modifier
             .width(170.dp)
             .height(220.dp)
+            .shadow(elevation = 10.dp, shape = RoundedCornerShape(20.dp), spotColor = colors.primary)
             .clip(RoundedCornerShape(20.dp))
-            .border(width = 1.5.dp, color = primaryColor, shape = RoundedCornerShape(20.dp))
+            .background(color = primaryColor).clickable {
+                navHostController.navigate(NavRoute.ProductDetail.route)
+            }
+//            .border(width = 1.5.dp, color = colors.secondary, shape = RoundedCornerShape(20.dp))
     ) {
         Image(
             painter = painterResource(id = item.imageRes),

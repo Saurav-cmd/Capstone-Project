@@ -7,5 +7,6 @@ sealed class NavRoute(val route: String) {
     object Home : NavRoute("home")
     object BottomNavigation : NavRoute("bottom_navigation")
     object ProductListing: NavRoute("product_listing")
+    object ProductDetail: NavRoute("product_detail")
 
 }

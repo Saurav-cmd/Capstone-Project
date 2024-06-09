@@ -16,6 +16,7 @@ import com.saurav.boozebuddy.screens.auth.LoginPage
 import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
 import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.screens.product.ProductListingScreen
+import com.saurav.boozebuddy.screens.product.ProductsDetailPage
 import getItemById
 
 object NavGraph {
@@ -27,7 +28,8 @@ object NavGraph {
             composable(NavRoute.Home.route) { HomePage(navController) }
             composable(NavRoute.SignUp.route) { SignupPage(navController) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController) }
-            composable(NavRoute.ProductListing.route) { ProductListingScreen()}
+            composable(NavRoute.ProductListing.route) { ProductListingScreen(navController)}
+            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
 //            composable(
 //                route = "${NavRoute.ProductListing}/{itemId}",
 //                arguments = listOf(navArgument("itemId") { type = NavType.IntType })

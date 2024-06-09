@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -98,14 +99,14 @@ private fun NotificationContainerDesign() {
                     text = "Your order was dispatched and will soon reach you.",
                     style = TextStyle(
                         fontSize = 14.sp,
-                        color = colors.secondary,
+                        color = Color.Black,
                         fontWeight = FontWeight.Bold
                     )
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(text = "2h ago", style = TextStyle(
                     fontSize = 14.sp,
-                    color = colors.secondary,
+                    color = Color.Black,
                 ))
             }
 

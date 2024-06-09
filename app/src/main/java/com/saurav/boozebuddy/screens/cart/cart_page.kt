@@ -55,23 +55,23 @@ fun CartPage() {
             TopContainer()
         }
         item {
-            Spacer(modifier = Modifier.height(height = 40.dp))
+            Spacer(modifier = Modifier.height(height = 20.dp))
             CartDesign()
         }
         item {
-            Spacer(modifier = Modifier.height(height = 40.dp))
+            Spacer(modifier = Modifier.height(height = 20.dp))
             CartDesign()
         }
         item {
-            Spacer(modifier = Modifier.height(height = 40.dp))
+            Spacer(modifier = Modifier.height(height = 20.dp))
             CartDesign()
         }
         item {
-            Spacer(modifier = Modifier.height(height = 40.dp))
+            Spacer(modifier = Modifier.height(height = 20.dp))
             CartDesign()
         }
         item {
-            Spacer(modifier = Modifier.height(height = 40.dp))
+            Spacer(modifier = Modifier.height(height = 20.dp))
             CartDesign()
         }
     }

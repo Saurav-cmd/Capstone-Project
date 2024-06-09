@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,6 +50,7 @@ import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.errorColor
+import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 
 @Composable
@@ -168,15 +171,15 @@ private fun BottomContainer() {
     return Column(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        BottomContainerDesign(Icons.Default.Info, "Information",  colors.secondary, "Help and Support")
-        BottomContainerDesign(Icons.Default.Settings, "Settings",  colors.secondary, "Settings")
+        BottomContainerDesign(Icons.Default.Info, "Information",  colors.secondary, "Help and Support",color = Color.Black)
+        BottomContainerDesign(Icons.Default.Settings, "Settings",  colors.secondary, "Settings",color = Color.Black)
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
                 .background(Color.Black)
         )
-        BottomContainerDesign(Icons.Default.Info, "App Info", colors.secondary, "App Info")
+        BottomContainerDesign(Icons.Default.Info, "App Info", colors.secondary, "App Info", color = Color.Black)
         BottomContainerDesign(
             Icons.Default.Lock,
             "Log Out",
@@ -198,7 +201,10 @@ private fun BottomContainerDesign(
     return Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp)
+            .padding(vertical = 10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = lightGrey
+        )
     ) {
         Row(
             modifier = Modifier.padding(vertical = 20.dp, horizontal = 5.dp),
