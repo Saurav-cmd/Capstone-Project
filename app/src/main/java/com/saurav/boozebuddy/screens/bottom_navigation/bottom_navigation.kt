@@ -19,6 +19,7 @@ import com.exyte.animatednavbar.AnimatedNavigationBar
 import com.exyte.animatednavbar.animation.balltrajectory.Straight
 import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.utils.noRippleClickable
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.screens.cart.CartPage
 import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.screens.notification.NotificationPage
@@ -45,8 +46,8 @@ private fun AnimatedNavBar(navController: NavHostController) {
                 selectedIndex = selectedIndex,
                 ballAnimation = Straight(tween(300)),
                 indentAnimation = Height(tween(300)),
-                barColor = primaryColor,
-                ballColor = primaryColor,
+                barColor = colors.secondary,
+                ballColor = colors.secondary,
             ) {
                 navigationBarItems.forEach { item ->
                     Box(
@@ -61,7 +62,7 @@ private fun AnimatedNavBar(navController: NavHostController) {
                             modifier = Modifier.size(26.dp),
                             imageVector = item.icon,
                             contentDescription = "Icon",
-                            tint = if (selectedIndex == item.ordinal) Color.White else bottomNavUnSelectedIconColor
+                            tint = if (selectedIndex == item.ordinal) colors.primary else bottomNavUnSelectedIconColor
                         )
                     }
                 }
