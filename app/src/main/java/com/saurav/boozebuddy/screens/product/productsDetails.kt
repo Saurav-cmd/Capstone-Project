@@ -52,7 +52,7 @@ fun ProductsDetailPage() {
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
