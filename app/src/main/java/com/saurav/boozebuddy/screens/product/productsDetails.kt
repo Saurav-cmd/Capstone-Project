@@ -1,21 +1,13 @@
 package com.saurav.boozebuddy.screens.product
 
-import android.view.RoundedCorner
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,46 +23,56 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.constants.ImagesConst
-import com.saurav.boozebuddy.constants.ThemeUtils.colors
-
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
-
 @Composable
 @Preview(showBackground = true)
 fun ProductsDetailPage() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(id = ImagesConst.simrsOff),
-            contentDescription = "Products Details Here",
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
-                .background(lightGrey)
-                .fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
-            ) {
-                Details()
-                Spacer(modifier = Modifier.height(25.dp))
-                PriceAndQuantity()
-                Spacer(modifier = Modifier.height(90.dp))
-                AddCartButton()
-            }
-
+        item {
+            ProductImage()
         }
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        item {
+            ProductDetailsSection()
+        }
+    }
+}
 
+@Composable
+fun ProductImage() {
+    Image(
+        painter = painterResource(id = ImagesConst.simrsOff),
+        contentDescription = "Products Details Here",
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun ProductDetailsSection() {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
+            .background(lightGrey)
+            .fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+        ) {
+            Details()
+            Spacer(modifier = Modifier.height(25.dp))
+            PriceAndQuantity()
+            Spacer(modifier = Modifier.height(90.dp))
+            AddCartButton()
+        }
     }
 }
 
@@ -92,11 +94,13 @@ private fun Details() {
                 color = Color.Black,
                 textAlign = TextAlign.Center
             )
-            IconButton(colors = IconButtonDefaults.iconButtonColors(
-                contentColor = Color.Red // Set the content color
-            ), onClick = {
-                //write function here
-            }
+            IconButton(
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = Color.Red
+                ),
+                onClick = {
+                    // Write function here
+                }
             ) {
                 Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favourites")
             }
@@ -132,7 +136,6 @@ private fun PriceAndQuantity() {
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color.LightGray)
-
         ) {
             Row(
                 modifier = Modifier
@@ -141,7 +144,6 @@ private fun PriceAndQuantity() {
                     .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-
             ) {
                 Column {
                     Text(
@@ -170,19 +172,18 @@ private fun PriceAndQuantity() {
     }
 }
 
-
 @Composable
 private fun QuantityBoxDesign(value: String) {
     Box(
         modifier = Modifier
             .size(height = 20.dp, width = 20.dp)
-            .background(Color.Gray),
+            .background(Color.Gray)
     ) {
         Text(
             text = value,
             textAlign = TextAlign.Center,
             modifier = Modifier.align(Alignment.Center),
-            color = colors.primary
+            color = primaryColor
         )
     }
 }
