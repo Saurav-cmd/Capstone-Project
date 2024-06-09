@@ -5,3 +5,4 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Item(val id: Int, val text: String, val imageRes: Int) : Parcelable
+
