@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,7 +17,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -49,26 +44,15 @@ fun HomePage(navController: NavHostController) {
             .imePadding(), // Adds padding for the on-screen keyboard if needed
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
     ) {
-        item {
-            GreetingContainer()
-            Spacer(modifier = Modifier.height(10.dp))
-        }
-        item {
-            "Search your favourite brand".TextFormField()
-            Spacer(modifier = Modifier.height(25.dp))
-        }
-        item {
-            Banner()
-            Spacer(modifier = Modifier.height(25.dp))
-        }
-        item {
-            TopBrandsLine()
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        // Use item for the TopBrandsGridView to avoid nested LazyColumn
-        item {
-            TopBrandsGridView(navController)
-        }
+        item { GreetingContainer() }
+        item { Spacer(modifier = Modifier.height(10.dp)) }
+        item { SearchField("Search your favourite brand") }
+        item { Spacer(modifier = Modifier.height(25.dp)) }
+        item { Banner() }
+        item { Spacer(modifier = Modifier.height(25.dp)) }
+        item { TopBrandsLine() }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { TopBrandsGridView(navController) }
     }
 }
 
@@ -83,7 +67,8 @@ private fun GreetingContainer() {
                 text = "Hello Saurav,\nGood Morning",
                 style = TextStyle(
                     color = colors.secondary,
-                    fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
             )
             Spacer(modifier = Modifier.height(5.dp))
@@ -91,17 +76,17 @@ private fun GreetingContainer() {
                 text = "London",
                 style = TextStyle(
                     color = colors.secondary,
-                    fontWeight = FontWeight.W500, fontSize = 14.sp
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp
                 )
             )
         }
         Box(
             modifier = Modifier
-                .clip(shape = RoundedCornerShape(50.dp))
+                .clip(RoundedCornerShape(50.dp))
                 .size(50.dp)
                 .background(color = colors.secondary)
-        ) {
-        }
+        )
     }
 }
 
@@ -123,16 +108,14 @@ private fun Banner() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun String.TextFormField() {
+private fun SearchField(placeholderText: String) {
     var textFieldValue by remember { mutableStateOf("") }
     val colors = MaterialTheme.colorScheme
 
     TextField(
         value = textFieldValue,
-        onValueChange = { data ->
-            textFieldValue = data
-        },
-        placeholder = { Text(text = this, color = containerColor) },
+        onValueChange = { textFieldValue = it },
+        placeholder = { Text(text = placeholderText, color = containerColor) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
@@ -184,8 +167,7 @@ fun TopBrandsGridView(navController: NavHostController) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val rows = items.chunked(3)
-        rows.forEach { rowItems ->
+        items.chunked(3).forEach { rowItems ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -197,7 +179,7 @@ fun TopBrandsGridView(navController: NavHostController) {
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        GridItem(item = item, navController)
+                        GridItem(item = item, navController = navController)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = item.text,
@@ -226,13 +208,11 @@ fun GridItem(item: Item, navController: NavHostController) {
             .height(100.dp)
             .clip(RoundedCornerShape(20.dp))
             .border(width = 1.5.dp, color = colors.secondary, shape = RoundedCornerShape(20.dp))
-            .clickable {
-                navController.navigate(NavRoute.ProductListing.route)
-            }
+            .clickable { navController.navigate(NavRoute.ProductListing.route) }
     ) {
         Image(
             painter = painterResource(id = item.imageRes),
-            contentDescription = "Promotion Banner Image",
+            contentDescription = "Brand Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
