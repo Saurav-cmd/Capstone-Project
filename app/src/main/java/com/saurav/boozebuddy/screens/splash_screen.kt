@@ -7,15 +7,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -27,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
-import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import kotlinx.coroutines.delay
 
@@ -54,7 +47,10 @@ fun StylishBBAnimation(onAnimationEnd: () -> Unit) {
         onAnimationEnd()
     }
 
-    Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier.size(200.dp),
+        contentAlignment = Alignment.Center
+    ) {
         BasicText(
             text = "BB",
             style = TextStyle(
@@ -63,15 +59,25 @@ fun StylishBBAnimation(onAnimationEnd: () -> Unit) {
                 color = colors.secondary
             )
         )
-        Canvas(modifier = Modifier.size(200.dp)) {
-            val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-            drawArc(
-                color = secondaryColor,
-                startAngle = 0f,
-                sweepAngle = animatedProgress * 360f,
-                useCenter = false,
-                style = Stroke(width = 8f, pathEffect = pathEffect, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        CircularProgressIndicator(progress = animatedProgress)
+    }
+}
+
+@Composable
+fun CircularProgressIndicator(progress: Float) {
+    Canvas(modifier = Modifier.size(200.dp)) {
+        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+        drawArc(
+            color = secondaryColor,
+            startAngle = 0f,
+            sweepAngle = progress * 360f,
+            useCenter = false,
+            style = Stroke(
+                width = 8f,
+                pathEffect = pathEffect,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round
             )
-        }
+        )
     }
 }
