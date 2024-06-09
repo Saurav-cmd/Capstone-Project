@@ -4,36 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -62,40 +40,36 @@ fun ProductListingScreen(navHostController: NavHostController) {
             .navigationBarsPadding()
             .imePadding(),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
-    ){
-        item {
-            TopContainer(navHostController)
-        }
-        item {
-            "Search".TextFormField()
-            Spacer(modifier = Modifier.height(25.dp))
-        }
-        item {
-            ProductGridView(navHostController)
-        }
+    ) {
+        item { TopContainer(navHostController) }
+        item { SearchBar() }
+        item { ProductGridView(navHostController) }
     }
 }
 
 @Composable
-private fun TopContainer(navController: NavHostController){
+private fun TopContainer(navController: NavHostController) {
     Box(
-        modifier = Modifier.fillMaxWidth(),
-    ){
-         Icon(
-             imageVector = Icons.Default.ArrowBack,
-             contentDescription = "Back",
-             tint = colors.secondary,
-             modifier = Modifier
-                 .padding(10.dp)
-                 .size(30.dp)
-                 .align(Alignment.CenterStart).clickable {
-                     navController.popBackStack()
-                 }
-         )
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Back",
+            tint = colors.secondary,
+            modifier = Modifier
+                .size(30.dp)
+                .align(Alignment.CenterStart)
+                .clickable { navController.popBackStack() }
+        )
 
         Text(
-            text = "Products", style = TextStyle(
-                color = colors.secondary, fontSize = 24.sp, fontWeight = FontWeight.Bold
+            text = "Products",
+            style = TextStyle(
+                color = colors.secondary,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
             ),
             modifier = Modifier.align(Alignment.Center)
         )
@@ -104,21 +78,23 @@ private fun TopContainer(navController: NavHostController){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun String.TextFormField() {
+private fun SearchBar() {
     var textFieldValue by remember { mutableStateOf("") }
     TextField(
         value = textFieldValue,
-        onValueChange = { data ->
-            textFieldValue = data
-        },
-        placeholder = { Text(text = this, color = secondaryColor) },
+        onValueChange = { textFieldValue = it },
+        placeholder = { Text(text = "Search", color = secondaryColor) },
         leadingIcon = {
-            Icon(imageVector = Icons.Default.Search, contentDescription = null, tint = secondaryColor)
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = secondaryColor
+            )
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
+            .border(1.dp, colors.secondary, RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
             textColor = colors.secondary,
@@ -126,19 +102,18 @@ private fun String.TextFormField() {
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
-        ),
+        )
     )
+    Spacer(modifier = Modifier.height(25.dp))
 }
 
 @Composable
 fun ProductGridView(navController: NavHostController) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val rows = items.chunked(2)
-        rows.forEach { rowItems ->
+        items.chunked(2).forEach { rowItems ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -146,18 +121,11 @@ fun ProductGridView(navController: NavHostController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 rowItems.forEach { item ->
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        GridItem(item, navController)
-                        Spacer(modifier = Modifier.height(4.dp))
-                    }
+                    GridItem(item, navController)
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
                 if (rowItems.size < 2) {
-                    repeat(2 - rowItems.size) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
+                    repeat(2 - rowItems.size) { Spacer(modifier = Modifier.weight(1f)) }
                 }
             }
         }
@@ -170,12 +138,10 @@ fun GridItem(item: Item, navHostController: NavHostController) {
         modifier = Modifier
             .width(170.dp)
             .height(220.dp)
-            .shadow(elevation = 10.dp, shape = RoundedCornerShape(20.dp), spotColor = colors.primary)
+            .shadow(10.dp, RoundedCornerShape(20.dp), spotColor = colors.primary)
             .clip(RoundedCornerShape(20.dp))
-            .background(color = primaryColor).clickable {
-                navHostController.navigate(NavRoute.ProductDetail.route)
-            }
-//            .border(width = 1.5.dp, color = colors.secondary, shape = RoundedCornerShape(20.dp))
+            .background(primaryColor)
+            .clickable { navHostController.navigate(NavRoute.ProductDetail.route) }
     ) {
         Image(
             painter = painterResource(id = item.imageRes),
@@ -190,45 +156,13 @@ fun GridItem(item: Item, navHostController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .background(color = Color(0x99000000))
+                .background(Color(0x99000000))
         ) {
             Column(
                 modifier = Modifier.padding(10.dp)
             ) {
-                Text(
-                    text = "Johnny Walker",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    ),
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "1L",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    ),
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "$100",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    ),
-                )
+                ProductInfo()
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             Icon(
                 imageVector = Icons.Default.ShoppingCart,
                 contentDescription = "Add to Cart",
@@ -239,3 +173,33 @@ fun GridItem(item: Item, navHostController: NavHostController) {
     }
 }
 
+@Composable
+fun ProductInfo() {
+    Text(
+        text = "Johnny Walker",
+        style = TextStyle(
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "1L",
+        style = TextStyle(
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
+        )
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "$100",
+        style = TextStyle(
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
+        )
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+}
