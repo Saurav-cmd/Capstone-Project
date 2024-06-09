@@ -1,7 +1,4 @@
 package com.saurav.boozebuddy
-
-
-import SignupPage
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,9 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.saurav.boozebuddy.app_navigation.NavGraph
-import com.saurav.boozebuddy.screens.auth.LoginPage
-import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
-import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.ui.theme.BoozeBuddyTheme
 import com.saurav.boozebuddy.ui.theme.bodyColor
 

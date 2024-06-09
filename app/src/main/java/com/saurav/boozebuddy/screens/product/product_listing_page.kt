@@ -53,8 +53,8 @@ fun ProductListingScreen() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
-            .imePadding(), // Adds padding for the on-screen keyboard if needed
+            .navigationBarsPadding()
+            .imePadding(),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
     ){
         item {
@@ -155,71 +155,6 @@ fun ProductGridView() {
         }
     }
 }
-
-//@Composable
-//fun GridItem(item: Item) {
-//    Box(
-//        modifier = Modifier
-//            .width(170.dp)
-//            .height(220.dp)
-//            .clip(RoundedCornerShape(20.dp))
-//            .border(width = 1.5.dp, color = primaryColor, shape = RoundedCornerShape(20.dp))
-//    ) {
-//        Image(
-//            painter = painterResource(id = item.imageRes),
-//            contentDescription = "Product Image",
-//            contentScale = ContentScale.Crop,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(10.dp)
-//        )
-//
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .align(Alignment.BottomCenter) // Align to the bottom center of the parent (image)
-//                .background(color = Color(0x99000000)) // Semi-transparent background color
-//        ) {
-//            Column(
-//                modifier = Modifier.padding(10.dp) // Add padding to the content
-//            ) {
-//                Text(
-//                    text = "item.name",
-//                    style = TextStyle(
-//                        color = Color.White,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 16.sp
-//                    ),
-//                )
-//
-//                Text(
-//                    text = "1L",
-//                    style = TextStyle(
-//                        color = Color.White,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 14.sp
-//                    ),
-//                )
-//
-//                Text(
-//                    text = "$$$$$",
-//                    style = TextStyle(
-//                        color = Color.White,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 14.sp
-//                    ),
-//                )
-//            }
-//
-//            Icon(
-//                imageVector = Icons.Default.ShoppingCart,
-//                contentDescription = "Add to Cart",
-//                tint = Color.White,
-//                modifier = Modifier.align(Alignment.BottomEnd)
-//            )
-//        }
-//    }
-//}
 
 @Composable
 fun GridItem(item: Item) {
