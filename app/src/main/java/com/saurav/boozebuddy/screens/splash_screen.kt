@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.app_navigation.NavRoute
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
+import com.saurav.boozebuddy.ui.theme.primaryColor
+import com.saurav.boozebuddy.ui.theme.secondaryColor
 import kotlinx.coroutines.delay
 
 @Composable
@@ -57,13 +60,13 @@ fun StylishBBAnimation(onAnimationEnd: () -> Unit) {
             style = TextStyle(
                 fontSize = 100.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = colors.secondary
             )
         )
         Canvas(modifier = Modifier.size(200.dp)) {
             val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
             drawArc(
-                color = Color.Black,
+                color = secondaryColor,
                 startAngle = 0f,
                 sweepAngle = animatedProgress * 360f,
                 useCenter = false,

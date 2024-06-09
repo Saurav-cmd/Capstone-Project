@@ -1,4 +1,3 @@
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,12 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
-import com.saurav.boozebuddy.ui.theme.bodyColor
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
-fun SignupPage(navController: NavHostController){
+fun SignupPage(navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -48,14 +47,17 @@ fun SignupPage(navController: NavHostController){
             ImageView()
         }
         item {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+            ) {
                 Text(
-                    text = "Create \n Account", style = TextStyle(
-                        color = primaryColor,
+                    text = "Create \n" +
+                            " Account", style = TextStyle(
+                        color = colors.secondary,
                         fontWeight = FontWeight.Bold, fontSize = 25.sp
-                    ),
+                    )
                 )
             }
         }
@@ -72,13 +74,14 @@ fun SignupPage(navController: NavHostController){
             "Password".TextFormField()
         }
         item {
-            "Re Enter Password".TextFormField()
+            "Confirm Password".TextFormField()
         }
         item {
             Spacer(modifier = Modifier.height(20.dp))
         }
         item {
-            Box(modifier = Modifier.fillMaxWidth(),
+            Box(
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             )
             {
@@ -90,9 +93,11 @@ fun SignupPage(navController: NavHostController){
         }
         item {
             Box(
-                modifier = Modifier.fillMaxWidth().clickable {
-                    navController.popBackStack()
-                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.popBackStack()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -118,7 +123,7 @@ private fun ImageView() {
             .height(250.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.signup),
+            painter = painterResource(id =  R.drawable.login),
             contentDescription = "Promotion Banner Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth()
@@ -130,13 +135,19 @@ private fun ImageView() {
 @Composable
 fun CustomButton() {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = {
+
+        },
         colors = ButtonDefaults.buttonColors(
-            containerColor = primaryColor,
-            contentColor = bodyColor
+            containerColor = secondaryColor,
+            contentColor = primaryColor
         )
-        ) {
-        Text(text = "Sign Up")
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 40.dp),
+            text = "Sign Up",
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+        )
     }
 }
 
@@ -154,10 +165,10 @@ private fun String.TextFormField() {
             .fillMaxWidth()
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
-            .border(width = 1.dp, color = primaryColor, shape = RoundedCornerShape(10.dp)),
+            .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
-            textColor = secondaryColor,
+            textColor = colors.secondary,
             containerColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

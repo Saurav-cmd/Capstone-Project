@@ -4,27 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,15 +21,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ImagesConst
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Item
-import com.saurav.boozebuddy.ui.theme.primaryColor
-import com.saurav.boozebuddy.ui.theme.secondaryColor
+import com.saurav.boozebuddy.ui.theme.containerColor
 
 val items = listOf(
     Item(1, "Johnnie Walker", imageRes = ImagesConst.johnnieWalker),
@@ -55,7 +39,6 @@ val items = listOf(
     Item(4, "Tequila", imageRes = ImagesConst.tequila),
     Item(5, "Vodka", imageRes = ImagesConst.vodka),
 )
-
 
 @Composable
 fun HomePage(navController: NavHostController) {
@@ -99,14 +82,14 @@ private fun GreetingContainer() {
             Text(
                 text = "Hello Saurav,\nGood Morning",
                 style = TextStyle(
-                    color = primaryColor,
+                    color = colors.secondary,
                     fontWeight = FontWeight.Bold, fontSize = 16.sp
                 )
             )
             Text(
                 text = "London",
                 style = TextStyle(
-                    color = secondaryColor,
+                    color = colors.secondary,
                     fontWeight = FontWeight.W500, fontSize = 14.sp
                 )
             )
@@ -115,10 +98,9 @@ private fun GreetingContainer() {
             modifier = Modifier
                 .clip(shape = RoundedCornerShape(50.dp))
                 .size(50.dp)
-                .background(color = primaryColor)
+                .background(color = colors.secondary)
         ) {
         }
-
     }
 }
 
@@ -142,19 +124,21 @@ private fun Banner() {
 @Composable
 private fun String.TextFormField() {
     var textFieldValue by remember { mutableStateOf("") }
+    val colors = MaterialTheme.colorScheme
+
     TextField(
         value = textFieldValue,
         onValueChange = { data ->
             textFieldValue = data
         },
-        placeholder = { Text(text = this, color = secondaryColor) },
+        placeholder = { Text(text = this, color = containerColor) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .border(width = 1.dp, color = primaryColor, shape = RoundedCornerShape(10.dp)),
+            .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
-            textColor = secondaryColor,
+            textColor = colors.secondary,
             containerColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -165,6 +149,8 @@ private fun String.TextFormField() {
 
 @Composable
 fun TopBrandsLine() {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -174,19 +160,19 @@ fun TopBrandsLine() {
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
-                .background(Color.Black)
+                .background(colors.onSurface)
         )
         Text(
             text = "Top Brands",
-            style = TextStyle( fontSize = 16.sp, fontWeight = FontWeight.Bold),
-            color = Color.Black,
+            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+            color = colors.onSurface,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
-                .background(Color.Black)
+                .background(colors.onSurface)
         )
     }
 }
@@ -214,7 +200,7 @@ fun TopBrandsGridView(navController: NavHostController) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = item.text,
-                            color = Color.Black,
+                            color = colors.onSurface,
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         )
@@ -232,15 +218,15 @@ fun TopBrandsGridView(navController: NavHostController) {
 
 @Composable
 fun GridItem(item: Item, navController: NavHostController) {
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .width(100.dp)
             .height(100.dp)
             .clip(RoundedCornerShape(20.dp))
-            .border(width = 1.5.dp, color = primaryColor, shape = RoundedCornerShape(20.dp))
+            .border(width = 1.5.dp, color = colors.secondary, shape = RoundedCornerShape(20.dp))
             .clickable {
                 navController.navigate(NavRoute.ProductListing.route)
-//                navController.navigate(NavRoute.ProductListing.route + "/${item.id}")
             }
     ) {
         Image(

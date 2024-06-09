@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
-import com.saurav.boozebuddy.ui.theme.bodyColor
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
@@ -62,7 +61,7 @@ fun LoginPage(navController: NavHostController) {
                 .padding(horizontal = 10.dp)){
             Text(
                 text = "Welcome \n Back", style = TextStyle(
-                    color = primaryColor,
+                    color = colors.secondary,
                     fontWeight = FontWeight.Bold, fontSize = 25.sp
                 )
             )
@@ -160,8 +159,8 @@ fun CustomButton(navController: NavHostController) {
                   navController.navigate(NavRoute.BottomNavigation.route)
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = primaryColor,
-            contentColor = bodyColor
+            containerColor = secondaryColor,
+            contentColor = primaryColor
         )
     ) {
         Text(
@@ -186,10 +185,10 @@ private fun String.TextFormField() {
             .fillMaxWidth()
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
-            .border(width = 1.dp, color = primaryColor, shape = RoundedCornerShape(10.dp)),
+            .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
-            textColor = secondaryColor,
+            textColor = colors.secondary,
             containerColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

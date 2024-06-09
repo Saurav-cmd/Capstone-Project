@@ -2,15 +2,12 @@ package com.saurav.boozebuddy.screens.cart
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saurav.boozebuddy.constants.ImagesConst
-import com.saurav.boozebuddy.ui.theme.bodyColor
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.errorColor
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
@@ -89,7 +86,7 @@ private fun TopContainer() {
     ) {
         Text(
             text = "My Cart", style = TextStyle(
-                color = primaryColor, fontSize = 18.sp, fontWeight = FontWeight.Bold
+                color = colors.secondary, fontSize = 18.sp, fontWeight = FontWeight.Bold
             )
         )
         Card {
@@ -113,9 +110,9 @@ private fun CartDesign() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Bag logo")
+                Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Bag logo", tint = colors.secondary)
                 Spacer(modifier = Modifier.width(width = 10.dp))
-                Text("JD", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold))
+                Text("JD", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = colors.secondary))
             }
             Text(
                 "View Brand",
@@ -123,6 +120,7 @@ private fun CartDesign() {
                     fontSize = 14.sp,
                     fontWeight = FontWeight.W400,
                     textAlign = TextAlign.End,
+                    color = colors.secondary
                 ),
             )
         }
@@ -170,7 +168,7 @@ private fun CartDesign() {
                 ) {
                     Text(
                         text = "8848 Vodka",
-                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colors.secondary)
                     )
                     Card {
                         Text(
@@ -186,11 +184,11 @@ private fun CartDesign() {
                 ) {
                     Text(
                         text = "Vodka",
-                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W500)
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, color = colors.secondary)
                     )
                     Text(
                         text = "10",
-                        style = TextStyle(textAlign = TextAlign.Center),
+                        style = TextStyle(textAlign = TextAlign.Center, color = colors.secondary),
                         modifier = Modifier.padding(end = 3.dp)
                     )
                 }
@@ -201,7 +199,7 @@ private fun CartDesign() {
                 ) {
                     Text(
                         text = "$10.04",
-                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.W400),
+                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.W400, color = colors.secondary),
                     )
                     Card {
                         Text(

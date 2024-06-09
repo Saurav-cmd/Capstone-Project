@@ -23,11 +23,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saurav.boozebuddy.R
-import com.saurav.boozebuddy.app_navigation.NavRoute
-import com.saurav.boozebuddy.ui.theme.bodyColor
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
+
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
-import com.saurav.boozebuddy.ui.theme.secondaryColor
+
 
 
 @Composable
@@ -138,7 +138,7 @@ private fun QuantityBoxDesign(value: String) {
             .size(height = 20.dp, width = 20.dp)
             .background(Color.Gray),
     ) {
-        Text(text = value, textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.Center), color = bodyColor)
+        Text(text = value, textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.Center), color = colors.primary)
     }
 }
 
@@ -157,7 +157,7 @@ fun AddCartButton  () {
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = primaryColor,
-                contentColor = bodyColor
+                contentColor = colors.primary
             )
         ) {
             Text(

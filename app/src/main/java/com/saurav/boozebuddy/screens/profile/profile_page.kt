@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.constants.ImagesConst
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.errorColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
@@ -73,11 +74,11 @@ private fun TopContainer() {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)
+                .height(180.dp)
         ) {
             val path = Path().apply {
                 moveTo(0f, size.height)
-                quadraticTo(size.width / 2, size.height - 100, size.width, size.height)
+                quadraticTo(size.width / 2, size.height - 200, size.width, size.height)
                 lineTo(size.width, 0f)
                 lineTo(0f, 0f)
                 close()
@@ -109,7 +110,7 @@ private fun TopContainer() {
                     .size(100.dp),
                 shape = CircleShape,
                 color = Color.White,
-                tonalElevation = 8.dp
+                tonalElevation = 20.dp
             ) {
                 Image(
                     painter = painterResource(id = ImagesConst.people),
@@ -121,7 +122,7 @@ private fun TopContainer() {
         }
     }
 
-    Spacer(modifier = Modifier.height(60.dp)) // Adjusted to accommodate the offset profile image
+    Spacer(modifier = Modifier.height(30.dp))
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -131,7 +132,8 @@ private fun TopContainer() {
             style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = colors.secondary
             ),
             modifier = Modifier.padding(horizontal = 20.dp)
         )
@@ -141,7 +143,8 @@ private fun TopContainer() {
             style = TextStyle(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = colors.secondary
             ),
             modifier = Modifier.padding(horizontal = 20.dp)
         )
@@ -151,7 +154,8 @@ private fun TopContainer() {
             style = TextStyle(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W400,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = colors.secondary
             ),
             modifier = Modifier.padding(horizontal = 30.dp)
         )
@@ -164,15 +168,15 @@ private fun BottomContainer() {
     return Column(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        BottomContainerDesign(Icons.Default.Info, "Information", primaryColor, "Help and Support")
-        BottomContainerDesign(Icons.Default.Settings, "Settings", primaryColor, "Settings")
+        BottomContainerDesign(Icons.Default.Info, "Information",  colors.secondary, "Help and Support")
+        BottomContainerDesign(Icons.Default.Settings, "Settings",  colors.secondary, "Settings")
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
                 .background(Color.Black)
         )
-        BottomContainerDesign(Icons.Default.Info, "App Info", primaryColor, "App Info")
+        BottomContainerDesign(Icons.Default.Info, "App Info", colors.secondary, "App Info")
         BottomContainerDesign(
             Icons.Default.Lock,
             "Log Out",
