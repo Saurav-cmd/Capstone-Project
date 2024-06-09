@@ -51,7 +51,7 @@ fun HomePage(navController: NavHostController) {
     ) {
         item {
             GreetingContainer()
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
         item {
             "Search your favourite brand".TextFormField()
