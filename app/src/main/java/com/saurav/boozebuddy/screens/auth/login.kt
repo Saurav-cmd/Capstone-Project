@@ -1,6 +1,7 @@
 package com.saurav.boozebuddy.screens.auth
 
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,13 +12,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,7 +36,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,9 +45,13 @@ import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
+import com.saurav.boozebuddy.view_models.AuthViewModel
 
 @Composable
-fun LoginPage(navController: NavHostController) {
+fun LoginPage(navController: NavHostController, authViewModel: AuthViewModel) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -71,10 +76,10 @@ fun LoginPage(navController: NavHostController) {
             Spacer(modifier = Modifier.height(20.dp))
         }
         item {
-            "Email".TextFormField()
+            "Email".TextFormField(email) {email = it}
         }
         item {
-            "Password".TextFormField()
+            "Password".TextFormField(password) { password = it }
         }
         item {
             Spacer(modifier = Modifier.height(10.dp))
@@ -106,7 +111,7 @@ fun LoginPage(navController: NavHostController) {
                 contentAlignment = Alignment.Center
             )
             {
-            CustomButton(navController)
+            CustomButton(navController, email, password, authViewModel)
             }
         }
         item {
@@ -153,33 +158,55 @@ private fun ImageView() {
 }
 
 @Composable
-fun CustomButton(navController: NavHostController) {
+fun CustomButton(navController: NavHostController, email: String, password: String, authViewModel: AuthViewModel) {
+    val isLoading by authViewModel.isLoading
+
     Button(
         onClick = {
-                  navController.navigate(NavRoute.BottomNavigation.route)
+            if (email.isEmpty() || password.isEmpty()) {
+                Log.e("EMPTY", "EMAIL AND PASSWORD IS EMPTY")
+            } else {
+                authViewModel.loginUser(email, password) { success, errorMsg ->
+                    if (success) {
+                        navController.navigate(NavRoute.BottomNavigation.route){
+                            popUpTo(NavRoute.Login.route) { inclusive = true }
+                        }
+                    } else {
+                        // Handle login failure, e.g., show error message
+                        Log.e("LOGIN_ERROR", "Error Occurred: $errorMsg")
+                    }
+                }
+            }
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = secondaryColor,
             contentColor = primaryColor
-        )
+        ),
+        enabled = !isLoading // Disable button while loading
     ) {
-        Text(
-            modifier = Modifier.padding(horizontal = 40.dp),
-            text = "Login",
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
-        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = primaryColor,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Text(
+                modifier = Modifier.padding(horizontal = 40.dp),
+                text = "Login",
+                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+            )
+        }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun String.TextFormField() {
-    var textFieldValue by remember { mutableStateOf("") }
+private fun String.TextFormField(value: String, onValueChange: (String) -> Unit) {
     TextField(
-        value = textFieldValue,
-        onValueChange = { data ->
-            textFieldValue = data
-        },
+        value = value,
+        onValueChange = onValueChange,
         placeholder = { Text(text = this, color = secondaryColor) },
         modifier = Modifier
             .fillMaxWidth()
@@ -188,11 +215,12 @@ private fun String.TextFormField() {
             .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
-            textColor = colors.secondary,
+            textColor = Color.Black,
             containerColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
+            disabledIndicatorColor = Color.Transparent,
+            cursorColor = Color.Black
         ),
     )
 }

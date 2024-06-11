@@ -22,14 +22,22 @@ import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.secondaryColor
+import com.saurav.boozebuddy.view_models.AuthViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
+fun SplashScreen(navController: NavHostController, authViewModel: AuthViewModel) {
     StylishBBAnimation {
-        navController.navigate(NavRoute.Login.route) {
-            popUpTo(NavRoute.Splash.route) { inclusive = true }
+        if(authViewModel.checkIfUserAlreadyLoggedIn()){
+            navController.navigate(NavRoute.BottomNavigation.route) {
+                popUpTo(NavRoute.Splash.route) { inclusive = true }
+            }
+        }else{
+            navController.navigate(NavRoute.Login.route){
+                popUpTo(NavRoute.Splash.route) {inclusive = true}
+            }
         }
+
     }
 }
 

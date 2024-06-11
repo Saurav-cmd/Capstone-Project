@@ -44,4 +44,5 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="title_activity_product_list_page">product_list_page</string>
+    <string name="title_activity_my_app">MyApp</string>
 </resources>

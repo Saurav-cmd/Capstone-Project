@@ -26,16 +26,18 @@ import com.saurav.boozebuddy.screens.notification.NotificationPage
 import com.saurav.boozebuddy.screens.profile.ProfilePage
 import com.saurav.boozebuddy.ui.theme.bottomNavUnSelectedIconColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
+import com.saurav.boozebuddy.view_models.AuthViewModel
+import com.saurav.boozebuddy.view_models.HomeViewModel
 
 @Composable
-fun BottomNavigationBarMain(navController: NavHostController) {
-    AnimatedNavBar(navController)
+fun BottomNavigationBarMain(navController: NavHostController, authViewModel: AuthViewModel, homeViewModel: HomeViewModel) {
+    AnimatedNavBar(navController, authViewModel, homeViewModel)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AnimatedNavBar(navController: NavHostController) {
+private fun AnimatedNavBar(navController: NavHostController,  authViewModel: AuthViewModel, homeViewModel: HomeViewModel) {
     val navigationBarItems = remember { NavigationBarItems.values() }
     var selectedIndex by remember { mutableStateOf(0) }
 
@@ -72,7 +74,7 @@ private fun AnimatedNavBar(navController: NavHostController) {
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedIndex) {
                 0 -> {
-                    HomePage(navController)
+                    HomePage(navController, homeViewModel)
                 }
                 1 -> {
                     NotificationPage()
@@ -81,7 +83,7 @@ private fun AnimatedNavBar(navController: NavHostController) {
                     CartPage()
                 }
                 else -> {
-                    ProfilePage()
+                    ProfilePage(authViewModel, navController)
                 }
             }
         }

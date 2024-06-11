@@ -5,39 +5,38 @@ package com.saurav.boozebuddy.app_navigation
 import SignupPage
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.NavType.ParcelableType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.saurav.boozebuddy.models.Item
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.screens.SplashScreen
 import com.saurav.boozebuddy.screens.auth.LoginPage
 import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
-import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.screens.product.ProductListingScreen
 import com.saurav.boozebuddy.screens.product.ProductsDetailPage
-import getItemById
+import com.saurav.boozebuddy.view_models.AuthViewModel
+import com.saurav.boozebuddy.view_models.HomeViewModel
 
 object NavGraph {
     @Composable
-    fun Setup(navController: NavHostController) {
+    fun Setup(
+        navController: NavHostController,
+        authViewModel: AuthViewModel,
+        homeViewModel: HomeViewModel,
+    ) {
         NavHost(navController = navController, startDestination = NavRoute.Splash.route) {
-            composable(NavRoute.Splash.route) { SplashScreen(navController) }
-            composable(NavRoute.Login.route) { LoginPage(navController) }
-            composable(NavRoute.Home.route) { HomePage(navController) }
+            composable(NavRoute.Splash.route) { SplashScreen(navController, authViewModel) }
+            composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
             composable(NavRoute.SignUp.route) { SignupPage(navController) }
-            composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController) }
-            composable(NavRoute.ProductListing.route) { ProductListingScreen(navController)}
+            composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
             composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
-//            composable(
-//                route = "${NavRoute.ProductListing}/{itemId}",
-//                arguments = listOf(navArgument("itemId") { type = NavType.IntType })
-//            ) { backStackEntry ->
-//                val itemId = backStackEntry.arguments?.getInt("itemId")
-//                val item = getItemById(itemId) // Implement this function to get the item by ID
-//                ProductListingScreen(item)
-//            }
+            composable(NavRoute.ProductListing.route + "/{products}") { backStackEntry ->
+                val productsJson = backStackEntry.arguments?.getString("products")
+                val productsListType = object : TypeToken<List<Product>>() {}.type
+                val products: List<Product> = Gson().fromJson(productsJson, productsListType)
+                ProductListingScreen(navController, products)
+            }
 
         }
     }
