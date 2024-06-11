@@ -29,7 +29,7 @@ object NavGraph {
             composable(NavRoute.SignUp.route) { SignupPage(navController) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController) }
             composable(NavRoute.ProductListing.route) { ProductListingScreen(navController)}
-            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
+            composable(NavRoute.ProductDetail.route) { ProductsDetailPage(navController) }
 //            composable(
 //                route = "${NavRoute.ProductListing}/{itemId}",
 //                arguments = listOf(navArgument("itemId") { type = NavType.IntType })

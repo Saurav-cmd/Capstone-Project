@@ -2,10 +2,12 @@ package com.saurav.boozebuddy.screens.product
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,26 +20,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.saurav.boozebuddy.R
+import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.constants.ImagesConst
+import com.saurav.boozebuddy.constants.ThemeUtils
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
-@Preview(showBackground = true)
-fun ProductsDetailPage() {
+fun ProductsDetailPage(navHostController: NavHostController) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
         item {
-            ProductImage()
+            ProductImage(navHostController)
         }
         item {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
         item {
             ProductDetailsSection()
@@ -46,15 +47,31 @@ fun ProductsDetailPage() {
 }
 
 @Composable
-fun ProductImage() {
-    Image(
-        painter = painterResource(id = ImagesConst.simrsOff),
-        contentDescription = "Products Details Here",
-        alignment = Alignment.Center,
-        contentScale = ContentScale.Fit,
-        modifier = Modifier.fillMaxWidth()
-    )
+fun ProductImage(navController: NavHostController) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Back",
+            tint = ThemeUtils.colors.secondary,
+            modifier = Modifier
+                .size(30.dp)
+                .align(Alignment.TopStart)
+                .clickable { navController.popBackStack() }
+        )
+        Image(
+            painter = painterResource(id = ImagesConst.simrsOff),
+            contentDescription = "Products Details Here",
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
+
 
 @Composable
 fun ProductDetailsSection() {
@@ -161,11 +178,11 @@ private fun PriceAndQuantity() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    QuantityBoxDesign(value = "-")
+                    QuantityBoxDesign(value = "-", onClick = { /* Decrease quantity */ })
                     Spacer(modifier = Modifier.width(5.dp))
-                    QuantityBoxDesign(value = "1")
+                    QuantityBoxDesign(value = "1", onClick = {})
                     Spacer(modifier = Modifier.width(5.dp))
-                    QuantityBoxDesign(value = "+")
+                    QuantityBoxDesign(value = "+", onClick = { /* Increase quantity */ })
                 }
             }
         }
@@ -173,11 +190,12 @@ private fun PriceAndQuantity() {
 }
 
 @Composable
-private fun QuantityBoxDesign(value: String) {
+private fun QuantityBoxDesign(value: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(height = 20.dp, width = 20.dp)
             .background(Color.Gray)
+            .clickable(onClick = onClick)
     ) {
         Text(
             text = value,
