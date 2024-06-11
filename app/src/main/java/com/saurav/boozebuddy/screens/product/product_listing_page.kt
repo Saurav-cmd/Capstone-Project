@@ -192,7 +192,7 @@ fun GridItem(item: Product, navHostController: NavHostController) {
         AsyncImage(
             model = item.productImage,
             contentDescription = item.productDescription,
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
         )
 
         Box(
