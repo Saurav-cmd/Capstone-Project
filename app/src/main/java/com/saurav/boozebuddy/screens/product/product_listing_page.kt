@@ -186,7 +186,8 @@ fun GridItem(item: Product, navHostController: NavHostController) {
             .background(color = primaryColor)
             .clickable {
                 navHostController.navigate(NavRoute.ProductDetail.route)
-            }
+            },
+        contentAlignment = Alignment.Center
     ) {
         AsyncImage(
             model = item.productImage,

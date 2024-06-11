@@ -2,6 +2,7 @@
 
 package com.saurav.boozebuddy.app_navigation
 
+import FavouritesListPage
 import SignupPage
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -31,6 +32,7 @@ object NavGraph {
             composable(NavRoute.SignUp.route) { SignupPage(navController) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
             composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
+            composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController) }
             composable(NavRoute.ProductListing.route + "/{products}") { backStackEntry ->
                 val productsJson = backStackEntry.arguments?.getString("products")
                 val productsListType = object : TypeToken<List<Product>>() {}.type

@@ -9,4 +9,6 @@ sealed class NavRoute(val route: String) {
     object ProductListing: NavRoute("product_listing")
     object ProductDetail: NavRoute("product_detail")
 
+    object FavouritesListing: NavRoute("favourites_listing")
+
 }

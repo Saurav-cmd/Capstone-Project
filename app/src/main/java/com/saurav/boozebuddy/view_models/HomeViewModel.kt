@@ -5,11 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.saurav.boozebuddy.api_services.ErrorHandler
 import com.saurav.boozebuddy.impl.home_impl.HomeImpl
 import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,9 +31,15 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     }
 
     private fun fetchBrands() {
-        _isLoading.value = true
-        viewModelScope.launch {
-            _brands.value = homeImpl.fetchBrands()
+        try {
+            _isLoading.value = true
+            viewModelScope.launch {
+                _brands.value = homeImpl.fetchBrands()
+            }
+        }catch (e:Exception){
+            _isLoading.value = false
+            ErrorHandler.getErrorMessage(e)
+        }finally {
             _isLoading.value = false
         }
     }
