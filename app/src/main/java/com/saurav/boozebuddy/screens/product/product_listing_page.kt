@@ -10,22 +10,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-<<<<<<< HEAD
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-=======
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,9 +35,16 @@ import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
+import com.saurav.boozebuddy.view_models.HomeViewModel
 
 @Composable
-fun ProductListingScreen(navHostController: NavHostController, productsJson: List<Product>) {
+fun ProductListingScreen(
+    navHostController: NavHostController,
+    productsJson: List<Product>,
+    homeViewModel: HomeViewModel
+) {
+    val filteredProducts by homeViewModel.filteredProduct.observeAsState(initial = emptyList())
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -53,53 +52,40 @@ fun ProductListingScreen(navHostController: NavHostController, productsJson: Lis
             .imePadding(),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
     ) {
-<<<<<<< HEAD
-        item { TopContainer(navHostController) }
-        item { SearchBar() }
-        item { ProductGridView(navHostController) }
-=======
         item {
             TopContainer(navHostController)
         }
         item {
-            "Search".TextFormField()
+            SearchBar(homeViewModel, productsJson)
             Spacer(modifier = Modifier.height(25.dp))
         }
         item {
-            ProductGridView(navHostController, productsJson)
+            if(filteredProducts.isEmpty()){
+                ProductGridView(navHostController, productsJson)
+            }else{
+                ProductGridView(navHostController, filteredProducts)
+            }
+
         }
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
     }
 }
 
 @Composable
 private fun TopContainer(navController: NavHostController) {
     Box(
-<<<<<<< HEAD
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-=======
         modifier = Modifier.fillMaxWidth(),
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
             tint = colors.secondary,
             modifier = Modifier
-<<<<<<< HEAD
-                .size(30.dp)
-                .align(Alignment.CenterStart)
-                .clickable { navController.popBackStack() }
-=======
                 .padding(10.dp)
                 .size(30.dp)
                 .align(Alignment.CenterStart)
                 .clickable {
                     navController.popBackStack()
                 }
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
         )
 
         Text(
@@ -116,11 +102,14 @@ private fun TopContainer(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SearchBar() {
+private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) {
     var textFieldValue by remember { mutableStateOf("") }
     TextField(
         value = textFieldValue,
-        onValueChange = { textFieldValue = it },
+        onValueChange = {
+            textFieldValue = it
+            homeViewModel.filterProducts(productData, textFieldValue)
+        },
         placeholder = { Text(text = "Search", color = secondaryColor) },
         leadingIcon = {
             Icon(
@@ -151,21 +140,6 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-<<<<<<< HEAD
-        items.chunked(2).forEach { rowItems ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                rowItems.forEach { item ->
-                    GridItem(item, navController)
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                if (rowItems.size < 2) {
-                    repeat(2 - rowItems.size) { Spacer(modifier = Modifier.weight(1f)) }
-=======
         if (productData.isEmpty()) {
             Text(text = "No Products to show!!")
         } else {
@@ -191,11 +165,9 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
                 }
             }
         }
-
     }
 }
 
@@ -205,12 +177,6 @@ fun GridItem(item: Product, navHostController: NavHostController) {
         modifier = Modifier
             .width(170.dp)
             .height(220.dp)
-<<<<<<< HEAD
-            .shadow(10.dp, RoundedCornerShape(20.dp), spotColor = colors.primary)
-            .clip(RoundedCornerShape(20.dp))
-            .background(primaryColor)
-            .clickable { navHostController.navigate(NavRoute.ProductDetail.route) }
-=======
             .shadow(
                 elevation = 10.dp,
                 shape = RoundedCornerShape(20.dp),
@@ -221,8 +187,6 @@ fun GridItem(item: Product, navHostController: NavHostController) {
             .clickable {
                 navHostController.navigate(NavRoute.ProductDetail.route)
             }
-//            .border(width = 1.5.dp, color = colors.secondary, shape = RoundedCornerShape(20.dp))
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
     ) {
         AsyncImage(
             model = item.productImage,
@@ -239,14 +203,6 @@ fun GridItem(item: Product, navHostController: NavHostController) {
             Column(
                 modifier = Modifier.padding(10.dp)
             ) {
-<<<<<<< HEAD
-                ProductInfo()
-            }
-            Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = "Add to Cart",
-                tint = Color.White,
-=======
                 Text(
                     text = item.productName ?: "",
                     style = TextStyle(
@@ -281,51 +237,16 @@ fun GridItem(item: Product, navHostController: NavHostController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
             IconButton(
                 onClick = { /*TODO*/ },
->>>>>>> ae85916 (#2 working on the product listing and product search by using dynamic data from firebase by Saurav Adhikari)
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
                     contentDescription = "Add to Cart",
                     tint = Color.White,
-
-                    )
+                )
             }
         }
     }
-}
-
-@Composable
-fun ProductInfo() {
-    Text(
-        text = "Johnny Walker",
-        style = TextStyle(
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
-        )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(
-        text = "1L",
-        style = TextStyle(
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
-        )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(
-        text = "$100",
-        style = TextStyle(
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
-        )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
 }

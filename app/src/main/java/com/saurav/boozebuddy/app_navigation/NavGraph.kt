@@ -35,7 +35,7 @@ object NavGraph {
                 val productsJson = backStackEntry.arguments?.getString("products")
                 val productsListType = object : TypeToken<List<Product>>() {}.type
                 val products: List<Product> = Gson().fromJson(productsJson, productsListType)
-                ProductListingScreen(navController, products)
+                ProductListingScreen(navController, products, homeViewModel)
             }
 
         }
