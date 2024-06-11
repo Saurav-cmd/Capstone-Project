@@ -33,6 +33,7 @@ import coil.compose.AsyncImage
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
+import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.HomeViewModel
@@ -178,12 +179,12 @@ fun GridItem(item: Product, navHostController: NavHostController) {
             .width(170.dp)
             .height(220.dp)
             .shadow(
-                elevation = 10.dp,
+                elevation = 1.dp,
                 shape = RoundedCornerShape(20.dp),
                 spotColor = colors.primary
             )
             .clip(RoundedCornerShape(20.dp))
-            .background(color = primaryColor)
+            .background(color = Color.Gray.copy(alpha = 0.1f))
             .clickable {
                 navHostController.navigate(NavRoute.ProductDetail.route)
             },
@@ -192,7 +193,9 @@ fun GridItem(item: Product, navHostController: NavHostController) {
         AsyncImage(
             model = item.productImage,
             contentDescription = item.productDescription,
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.FillHeight, // Change contentScale to FillBounds
+            modifier = Modifier
+                .fillMaxHeight() // Use fillMaxSize to match the size of the parent Box
         )
 
         Box(
