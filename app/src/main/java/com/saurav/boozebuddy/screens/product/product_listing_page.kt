@@ -50,7 +50,7 @@ fun ProductListingScreen(
             .fillMaxSize()
             .navigationBarsPadding()
             .imePadding(),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
+        contentPadding = PaddingValues(vertical = 10.dp)
     ) {
         item {
             TopContainer(navHostController)
@@ -73,7 +73,7 @@ fun ProductListingScreen(
 @Composable
 private fun TopContainer(navController: NavHostController) {
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
@@ -120,7 +120,7 @@ private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) 
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp)
+            .padding(start = 20.dp,top = 10.dp, end = 20.dp)
             .border(1.dp, colors.secondary, RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
