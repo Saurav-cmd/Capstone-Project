@@ -14,16 +14,40 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(private val authImpl: AuthImpl) : ViewModel() {
 
     var isLoading = mutableStateOf(false)
+    var isCreatingNewUser = mutableStateOf(false)
     var isLoggingOut = mutableStateOf(false)
     fun loginUser(email: String, password: String, callback: (Boolean, String?) -> Unit){
-        isLoading.value = true
-        viewModelScope.launch {
-            authImpl.userLogin(email, password){ success, errMsg ->
-                run {
-                    isLoading.value = false
-                    callback(success, errMsg)
+       try {
+           isLoading.value = true
+           viewModelScope.launch {
+               authImpl.userLogin(email, password){ success, errMsg ->
+                   run {
+                       callback(success, errMsg)
+                   }
+               }
+           }
+       }catch (e:Exception){
+           isLoading.value = false
+       }finally {
+           isLoading.value = false
+       }
+    }
+
+    fun signUpUser(name:String, email:String, password:String, callback: (Boolean, String?) -> Unit){
+        try{
+            isCreatingNewUser.value = true
+            viewModelScope.launch {
+                authImpl.userSignUp(name, email, password){success, errMsg ->
+                    run {
+                        callback(success,errMsg)
+                    }
                 }
             }
+        }catch (e: Exception){
+            isCreatingNewUser.value = false
+            callback(false, e.toString())
+        }finally {
+            isCreatingNewUser.value = false
         }
     }
 

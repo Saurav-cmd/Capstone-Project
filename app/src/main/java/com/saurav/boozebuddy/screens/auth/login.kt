@@ -63,7 +63,7 @@ fun LoginPage(navController: NavHostController, authViewModel: AuthViewModel) {
         item {
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)){
+                .padding(horizontal = 20.dp)){
             Text(
                 text = "Welcome \n Back", style = TextStyle(
                     color = colors.secondary,
@@ -211,7 +211,7 @@ private fun String.TextFormField(value: String, onValueChange: (String) -> Unit)
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .padding(horizontal = 10.dp)
+            .padding(horizontal = 20.dp)
             .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(

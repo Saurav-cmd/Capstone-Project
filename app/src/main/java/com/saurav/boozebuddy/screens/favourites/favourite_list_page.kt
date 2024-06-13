@@ -68,7 +68,7 @@ private fun TopContainer(navController: NavHostController) {
                 .size(30.dp)
                 .align(Alignment.CenterStart)
                 .clickable {
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
         )
 

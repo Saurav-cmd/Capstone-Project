@@ -13,9 +13,16 @@ class AuthImpl @Inject constructor(private val firebaseHelper: FirebaseHelper): 
     }
 
     //Function to signup user
-    override fun userSignUp() {
-        TODO("Not yet implemented")
+    override fun userSignUp(
+        name: String,
+        email: String,
+        password: String,
+        callback: (Boolean, String?) -> Unit
+    ) {
+        firebaseHelper.signUpWithEmailAndPassword(name, email,password ,callback)
     }
+
+
 
     override fun userLogout() {
         firebaseHelper.signOutUser()

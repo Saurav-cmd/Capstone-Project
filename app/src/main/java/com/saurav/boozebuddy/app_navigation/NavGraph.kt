@@ -29,7 +29,7 @@ object NavGraph {
         NavHost(navController = navController, startDestination = NavRoute.Splash.route) {
             composable(NavRoute.Splash.route) { SplashScreen(navController, authViewModel) }
             composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
-            composable(NavRoute.SignUp.route) { SignupPage(navController) }
+            composable(NavRoute.SignUp.route) { SignupPage(navController, authViewModel) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
             composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController) }
