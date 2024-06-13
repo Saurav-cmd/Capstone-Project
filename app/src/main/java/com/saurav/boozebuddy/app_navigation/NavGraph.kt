@@ -11,9 +11,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.screens.SplashScreen
 import com.saurav.boozebuddy.screens.auth.LoginPage
 import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
+import com.saurav.boozebuddy.screens.product.ProductListingScreen
 import com.saurav.boozebuddy.screens.product.ProductsDetailPage
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
@@ -30,7 +34,15 @@ object NavGraph {
             composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
             composable(NavRoute.SignUp.route) { SignupPage(navController, authViewModel) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
+//            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController) }
+            composable(NavRoute.ProductListing.route + "/{products}") { backStackEntry ->
+                val productsJson = backStackEntry.arguments?.getString("products")
+                val productsListType = object : TypeToken<List<Product>>() {}.type
+                val products: List<Product> = Gson().fromJson(productsJson, productsListType)
+                ProductListingScreen(navController, products, homeViewModel)
+            }
+
             composable(
                 route = NavRoute.ProductDetail.route + "/{productId}/{productName}/{productImage}",
                 arguments = listOf(
