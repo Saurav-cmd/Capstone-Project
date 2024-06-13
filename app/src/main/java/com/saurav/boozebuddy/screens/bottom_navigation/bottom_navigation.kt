@@ -83,7 +83,7 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
                     CartPage()
                 }
                 else -> {
-                    ProfilePage(authViewModel, navController)
+                    ProfilePage(authViewModel, navController, homeViewModel)
                 }
             }
         }

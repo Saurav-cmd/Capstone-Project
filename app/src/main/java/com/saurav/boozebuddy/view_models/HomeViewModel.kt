@@ -37,6 +37,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
         fetchBrands()
     }
 
+    //function to fetch the brands
     private fun fetchBrands() {
         try {
             _isLoading.value = true
@@ -51,6 +52,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
         }
     }
 
+    //Function to filter the products by product name
     fun filterProducts(products: List<Product>, query: String){
         val filteredList = mutableListOf<Product>()
         if (query.isNotBlank()) {
@@ -63,6 +65,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
         _filteredProduct.value = filteredList
     }
 
+    //Function used to fetch the logged in user info
     fun fetchUserInfo(){
         try{
             _isFetchingUserInfo.value = true

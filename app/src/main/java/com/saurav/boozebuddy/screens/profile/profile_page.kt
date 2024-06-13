@@ -39,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,15 +63,17 @@ import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
+import com.saurav.boozebuddy.models.UserModel
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.errorColor
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.AuthViewModel
+import com.saurav.boozebuddy.view_models.HomeViewModel
 
 @Composable
-fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostController) {
+fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostController, homeViewModel: HomeViewModel) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -78,7 +81,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostControll
             .imePadding(),
     ) {
         item {
-            TopContainer()
+            TopContainer(homeViewModel)
         }
         item {
             Spacer(modifier = Modifier.height(10.dp))
@@ -88,7 +91,9 @@ fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostControll
 }
 
 @Composable
-private fun TopContainer() {
+private fun TopContainer(homeViewModel: HomeViewModel) {
+    val isLoading by homeViewModel.isFetchingUserInfo.observeAsState(initial = false)
+    val userInfo by homeViewModel.userInfo.observeAsState(initial = UserModel())
     Box {
         Canvas(
             modifier = Modifier
@@ -146,17 +151,30 @@ private fun TopContainer() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Johns Steel",
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = colors.secondary
-            ),
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
-        Spacer(modifier = Modifier.height(5.dp))
+        if(isLoading){
+            Text(
+                text = "Loading...",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary
+                ),
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+        }else{
+            Text(
+                text = userInfo.name,
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary
+                ),
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+        }
+        /*Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = "UI/UX Designer",
             style = TextStyle(
@@ -166,8 +184,8 @@ private fun TopContainer() {
                 color = colors.secondary
             ),
             modifier = Modifier.padding(horizontal = 20.dp)
-        )
-        Spacer(modifier = Modifier.height(5.dp))
+        )*/
+      /*  Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
             style = TextStyle(
@@ -177,7 +195,7 @@ private fun TopContainer() {
                 color = colors.secondary
             ),
             modifier = Modifier.padding(horizontal = 30.dp)
-        )
+        )*/
     }
 }
 

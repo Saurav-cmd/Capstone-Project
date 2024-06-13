@@ -28,8 +28,7 @@ import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
-@Preview(showBackground = true)
-fun ProductsDetailPage() {
+fun ProductsDetailPage(productId: String?, productName: String?, productImage: String?) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -40,7 +39,7 @@ fun ProductsDetailPage() {
             Spacer(modifier = Modifier.height(8.dp))
         }
         item {
-            ProductDetailsSection()
+            ProductDetailsSection(productName)
         }
     }
 }
@@ -57,7 +56,7 @@ fun ProductImage() {
 }
 
 @Composable
-fun ProductDetailsSection() {
+fun ProductDetailsSection(productName:String?) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
@@ -67,7 +66,7 @@ fun ProductDetailsSection() {
         Column(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
         ) {
-            Details()
+            Details(productName)
             Spacer(modifier = Modifier.height(25.dp))
             PriceAndQuantity()
             Spacer(modifier = Modifier.height(90.dp))
@@ -77,7 +76,7 @@ fun ProductDetailsSection() {
 }
 
 @Composable
-private fun Details() {
+private fun Details(productName: String?) {
     Column(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -89,7 +88,7 @@ private fun Details() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Simrs off Liquor",
+                text = "$productName",
                 style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                 color = Color.Black,
                 textAlign = TextAlign.Center

@@ -30,8 +30,8 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         }
     }
 
-    suspend fun fetchUserInfo() : UserModel? {
-        return try{
+    suspend fun fetchUserInfo(): UserModel? {
+        return try {
             val currentUser = auth.currentUser ?: throw Exception("Not logged in")
             val uid = currentUser.uid
 
@@ -44,9 +44,37 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             } else {
                 throw Exception("User not found")
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             ErrorHandler.getErrorMessage(e)
             UserModel()
+        }
+    }
+
+    suspend fun storeUSerFavourites(
+        productName: String,
+        brandName: String,
+        productImage: String,
+        callback: (Boolean, String?) -> Unit
+    ) {
+        try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            val favourite = hashMapOf(
+                "productName" to productName,
+                "brandName" to brandName,
+                "productImage" to productImage
+            )
+            firestore.collection("users")
+                .document(uid)
+                .collection("favourites")
+                .add(favourite)
+                .await()
+
+            callback(true, "Favourite added successfully")
+        } catch (e: Exception) {
+            callback(false, "$e")
+            ErrorHandler.getErrorMessage(e)
         }
     }
 }

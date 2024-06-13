@@ -6,8 +6,10 @@ import FavouritesListPage
 import SignupPage
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.saurav.boozebuddy.models.Product
@@ -31,7 +33,7 @@ object NavGraph {
             composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
             composable(NavRoute.SignUp.route) { SignupPage(navController, authViewModel) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
-            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
+//            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController) }
             composable(NavRoute.ProductListing.route + "/{products}") { backStackEntry ->
                 val productsJson = backStackEntry.arguments?.getString("products")
@@ -40,6 +42,19 @@ object NavGraph {
                 ProductListingScreen(navController, products, homeViewModel)
             }
 
+            composable(
+                route = NavRoute.ProductDetail.route + "/{productId}/{productName}/{productImage}",
+                arguments = listOf(
+                    navArgument("productId") { type = NavType.StringType },
+                    navArgument("productName") { type = NavType.StringType },
+                    navArgument("productImage") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val productId = backStackEntry.arguments?.getString("productId")
+                val productName = backStackEntry.arguments?.getString("productName")
+                val productImage = backStackEntry.arguments?.getString("productImage")
+                ProductsDetailPage(productId, productName, productImage)
+            }
         }
     }
 }
