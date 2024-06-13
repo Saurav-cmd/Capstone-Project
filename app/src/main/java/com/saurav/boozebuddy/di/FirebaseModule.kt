@@ -28,7 +28,7 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirestoreHelper(firestore: FirebaseFirestore): FirestoreHelper = FirestoreHelper(firestore)
+    fun provideFirestoreHelper(firestore: FirebaseFirestore, auth:FirebaseAuth): FirestoreHelper = FirestoreHelper(firestore, auth)
 
     //his method tells Hilt to create a FirebaseHelper instance by
     // passing the FirebaseAuth instance provided by provideFirebaseAuth

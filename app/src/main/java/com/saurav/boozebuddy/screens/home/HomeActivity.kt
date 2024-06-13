@@ -31,6 +31,7 @@ import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.BrandModel
+import com.saurav.boozebuddy.models.UserModel
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
@@ -43,6 +44,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     val brands by homeViewModel.brands.observeAsState(emptyList())
     val isLoading by homeViewModel.isLoading.observeAsState(false)
 
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +52,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
             .imePadding(), // Adds padding for the on-screen keyboard if needed
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
     ) {
-        item { GreetingContainer(navController) }
+        item { GreetingContainer(navController, homeViewModel) }
         item { Spacer(modifier = Modifier.height(10.dp)) }
         item { SearchField("Search your favourite brand") }
         item { Spacer(modifier = Modifier.height(25.dp)) }
@@ -88,20 +90,35 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
 }
 
 @Composable
-private fun GreetingContainer(navController: NavHostController) {
+private fun GreetingContainer(navController: NavHostController, homeViewModel: HomeViewModel) {
+    val isLoading by homeViewModel.isFetchingUserInfo.observeAsState(initial = false)
+    val userInfo by homeViewModel.userInfo.observeAsState(initial = UserModel())
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
-            Text(
-                text = "Hello Saurav,\nGood Morning",
-                style = TextStyle(
-                    color = colors.secondary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+            if(isLoading){
+                Text(
+                    text = "Loading...",
+                    style = TextStyle(
+                        color = colors.secondary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 )
-            )
+            }else{
+                Text(
+                    text = "Hello ${userInfo.name.split(" ")[0]},\n${homeViewModel.getGreetingMessage()}",
+                    style = TextStyle(
+                        color = colors.secondary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                )
+            }
+
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "London",
@@ -115,7 +132,8 @@ private fun GreetingContainer(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
-                .size(50.dp).clickable {
+                .size(50.dp)
+                .clickable {
                     navController.navigate(NavRoute.FavouritesListing.route)
                 }
         ) {

@@ -40,7 +40,7 @@ fun BottomNavigationBarMain(navController: NavHostController, authViewModel: Aut
 private fun AnimatedNavBar(navController: NavHostController,  authViewModel: AuthViewModel, homeViewModel: HomeViewModel) {
     val navigationBarItems = remember { NavigationBarItems.values() }
     var selectedIndex by remember { mutableStateOf(0) }
-
+    homeViewModel.fetchUserInfo()
     Scaffold(
         bottomBar = {
             AnimatedNavigationBar(
