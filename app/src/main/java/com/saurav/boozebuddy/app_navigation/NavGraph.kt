@@ -20,6 +20,7 @@ import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
 import com.saurav.boozebuddy.screens.product.ProductListingScreen
 import com.saurav.boozebuddy.screens.product.ProductsDetailPage
 import com.saurav.boozebuddy.view_models.AuthViewModel
+import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
 
 object NavGraph {
@@ -28,6 +29,7 @@ object NavGraph {
         navController: NavHostController,
         authViewModel: AuthViewModel,
         homeViewModel: HomeViewModel,
+        favouritesViewModel: FavouritesViewModel
     ) {
         NavHost(navController = navController, startDestination = NavRoute.Splash.route) {
             composable(NavRoute.Splash.route) { SplashScreen(navController, authViewModel) }
@@ -44,17 +46,19 @@ object NavGraph {
             }
 
             composable(
-                route = NavRoute.ProductDetail.route + "/{productId}/{productName}/{productImage}",
+                route = NavRoute.ProductDetail.route + "/{productId}/{productName}/{productImage}/{productDetail}",
                 arguments = listOf(
                     navArgument("productId") { type = NavType.StringType },
                     navArgument("productName") { type = NavType.StringType },
-                    navArgument("productImage") { type = NavType.StringType }
+                    navArgument("productImage") { type = NavType.StringType },
+                    navArgument("productDetail") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
                 val productId = backStackEntry.arguments?.getString("productId")
                 val productName = backStackEntry.arguments?.getString("productName")
                 val productImage = backStackEntry.arguments?.getString("productImage")
-                ProductsDetailPage(productId, productName, productImage)
+                val productDetail = backStackEntry.arguments?.getString("productDetail")
+                ProductsDetailPage(navController,favouritesViewModel,productId, productName, productImage, productDetail)
             }
         }
     }

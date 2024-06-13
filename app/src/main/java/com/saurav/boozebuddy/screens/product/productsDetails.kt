@@ -1,11 +1,17 @@
 package com.saurav.boozebuddy.screens.product
 
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -21,62 +28,109 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import com.google.gson.Gson
 import com.saurav.boozebuddy.R
+import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ImagesConst
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
+import com.saurav.boozebuddy.view_models.FavouritesViewModel
 
 @Composable
-fun ProductsDetailPage(productId: String?, productName: String?, productImage: String?) {
+fun ProductsDetailPage(navHostController: NavHostController,favouritesViewModel: FavouritesViewModel,productId: String?, productName: String?, productImage: String?, productDetail: String?) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxSize()
     ) {
         item {
-            ProductImage()
+            ProductImage(navHostController,productImage?.trim('"'))
         }
         item {
             Spacer(modifier = Modifier.height(8.dp))
         }
         item {
-            ProductDetailsSection(productName)
+            ProductDetailsSection(productName, productDetail, favouritesViewModel, productImage?:"")
         }
     }
 }
 
-@Composable
-fun ProductImage() {
-    Image(
-        painter = painterResource(id = ImagesConst.simrsOff),
-        contentDescription = "Products Details Here",
-        alignment = Alignment.Center,
-        contentScale = ContentScale.Fit,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
+
 
 @Composable
-fun ProductDetailsSection(productName:String?) {
+fun ProductImage(navController: NavHostController, productImage: String?) {
     Box(
         modifier = Modifier
+            .fillMaxWidth()
+            .height(500.dp)
+            .padding(16.dp).background(color = Color.LightGray)
+    ) {
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Back",
+            tint = colors.secondary,
+            modifier = Modifier
+                .size(30.dp)
+                .align(Alignment.TopStart)
+                .clickable {
+                    navController.navigateUp()
+                    Log.e("THis is url", "$productImage")
+                }
+        )
+        Text(text = "$productImage", color = Color.Black)
+
+        if ((productImage ?: "").isEmpty()) {
+            Image(
+                painter = painterResource(id = ImagesConst.simrsOff),
+                contentDescription = "Products Details Here",
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            Image(
+                painter = rememberAsyncImagePainter(model = productImage),
+                contentDescription = "Product Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+
+
+@Composable
+fun ProductDetailsSection(productName:String?, productDetail: String?, favouritesViewModel: FavouritesViewModel, productImage:String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight() // Fill the entire screen height
             .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
             .background(lightGrey)
-            .fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .fillMaxSize()
         ) {
-            Details(productName)
+            Details(productName, productDetail, favouritesViewModel, productImage)
             Spacer(modifier = Modifier.height(25.dp))
-            PriceAndQuantity()
-            Spacer(modifier = Modifier.height(90.dp))
+//            PriceAndQuantity()
+            Spacer(modifier = Modifier.weight(1f)) // Fill remaining space
             AddCartButton()
         }
     }
 }
 
+
 @Composable
-private fun Details(productName: String?) {
+private fun Details(productName: String?, productDetail: String?, favouritesViewModel: FavouritesViewModel, productImage: String) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -99,20 +153,28 @@ private fun Details(productName: String?) {
                 ),
                 onClick = {
                     // Write function here
+                    favouritesViewModel.storeIsFavourites(productName?:"", "Vodka", productImage){success, errMsg ->
+                        if(success){
+                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                        }else{
+                            //error
+                            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             ) {
                 Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favourites")
             }
         }
         Spacer(modifier = Modifier.height(5.dp))
-        Description()
+        Description(productDetail)
     }
 }
 
 @Composable
-private fun Description() {
+private fun Description(productDetail: String?) {
     Text(
-        text = "Alcohol with 10% Alcohol level enjoy your company with 32 others",
+        text = "$productDetail",
         style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Light),
         color = Color.Black,
         modifier = Modifier.fillMaxWidth(fraction = 0.5f)
@@ -199,12 +261,9 @@ fun AddCartButton() {
         ),
         modifier = Modifier.padding(horizontal = 40.dp)
     ) {
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Add to Cart",
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
-            )
-            Text(text = "$350.69", fontSize = 16.sp)
-        }
+        Text(
+            text = "Add to Wishlist",
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+        )
     }
 }

@@ -1,6 +1,7 @@
 package com.saurav.boozebuddy.screens.product
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -192,7 +193,8 @@ fun GridItem(item: Product, navHostController: NavHostController) {
                 val productName = Uri.encode(Gson().toJson(item.productName))
                 val productImage = Uri.encode(Gson().toJson(item.productImage))
                 val productID = Uri.encode(Gson().toJson(item.productId))
-                navHostController.navigate("${NavRoute.ProductDetail.route}/${productID}/${productName}/${productImage}")
+                val productDetail = Uri.encode(Gson().toJson(item.productDescription))
+                navHostController.navigate("${NavRoute.ProductDetail.route}/${productID}/${productName}/${productImage}/${productDetail}")
             },
         contentAlignment = Alignment.Center
     ) {

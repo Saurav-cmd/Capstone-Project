@@ -1,6 +1,7 @@
 package com.saurav.boozebuddy.screens.home
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -275,6 +276,7 @@ fun GridItem(brandData: BrandModel, navController: NavHostController) {
             .clickable {
                 val jsonEncoded = Uri.encode(Gson().toJson(brandData.products))
                 navController.navigate("${NavRoute.ProductListing.route}/$jsonEncoded")
+                Log.e("This is bnrand logo", "${brandData.brandLogo}")
             }
     )
     {
