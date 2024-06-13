@@ -8,6 +8,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,8 +31,10 @@ import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.BrandModel
+import com.saurav.boozebuddy.models.UserModel
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.primaryColor
+import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.HomeViewModel
 
 
@@ -40,6 +45,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     val brands by homeViewModel.brands.observeAsState(emptyList())
     val isLoading by homeViewModel.isLoading.observeAsState(false)
 
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -47,7 +53,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
             .imePadding(), // Adds padding for the on-screen keyboard if needed
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
     ) {
-        item { GreetingContainer() }
+        item { GreetingContainer(navController, homeViewModel) }
         item { Spacer(modifier = Modifier.height(10.dp)) }
         item { SearchField("Search your favourite brand") }
         item { Spacer(modifier = Modifier.height(25.dp)) }
@@ -57,11 +63,19 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
         item { Spacer(modifier = Modifier.height(16.dp)) }
         item {
             if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = primaryColor,
-                    strokeWidth = 2.dp
-                )
+               Column(
+                   modifier = Modifier.fillMaxWidth(),
+                   horizontalAlignment = Alignment.CenterHorizontally,
+                   verticalArrangement = Arrangement.Center
+               ) {
+                   CircularProgressIndicator(
+                       modifier = Modifier.size(50.dp),
+                       color = secondaryColor,
+                       strokeWidth = 2.dp
+                   )
+                   Spacer(modifier = Modifier.height(5.dp))
+                   Text(text = "Loading Brands...", color = secondaryColor, fontSize = 18.sp)
+               }
             } else if (brands.isEmpty()) {
                 Text(
                     text = "Brands are not available",
@@ -77,20 +91,35 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
 }
 
 @Composable
-private fun GreetingContainer() {
+private fun GreetingContainer(navController: NavHostController, homeViewModel: HomeViewModel) {
+    val isLoading by homeViewModel.isFetchingUserInfo.observeAsState(initial = false)
+    val userInfo by homeViewModel.userInfo.observeAsState(initial = UserModel())
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
-            Text(
-                text = "Hello Saurav,\nGood Morning",
-                style = TextStyle(
-                    color = colors.secondary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+            if(isLoading){
+                Text(
+                    text = "Loading...",
+                    style = TextStyle(
+                        color = colors.secondary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 )
-            )
+            }else{
+                Text(
+                    text = "Hello ${userInfo.name.split(" ")[0]},\n${homeViewModel.getGreetingMessage()}",
+                    style = TextStyle(
+                        color = colors.secondary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                )
+            }
+
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "London",
@@ -105,8 +134,19 @@ private fun GreetingContainer() {
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
                 .size(50.dp)
-                .background(color = colors.secondary)
-        )
+                .clickable {
+                    navController.navigate(NavRoute.FavouritesListing.route)
+                }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Favourites",
+                tint = Color.Red,
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+        }
     }
 }
 
@@ -183,43 +223,44 @@ fun TopBrandsLine() {
 
 @Composable
 fun TopBrandsGridView(navController: NavHostController, brands: List<BrandModel>) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            brands.chunked(3).forEach { brands ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    brands.forEach { item ->
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            GridItem(brandData = item, navController = navController)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = item.brandName ?: "",
-                                color = colors.onSurface,
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
-                                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                            )
-                        }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        brands.chunked(3).forEach { brands ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                brands.forEach { item ->
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        GridItem(brandData = item, navController = navController)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = item.brandName ?: "",
+                            color = colors.onSurface,
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        )
                     }
-                    if (brands.size < 3) {
-                        repeat(3 - brands.size) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
+                }
+                if (brands.size < 3) {
+                    repeat(3 - brands.size) {
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
         }
 
-}
+    }
 
+
+}
 
 
 @Composable
