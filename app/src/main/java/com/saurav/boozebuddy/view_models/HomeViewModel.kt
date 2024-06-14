@@ -12,9 +12,8 @@ import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import javax.inject.Inject
 import java.util.Calendar
+import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewModel() {
@@ -78,6 +77,10 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
         }finally {
             _isFetchingUserInfo.value = false
         }
+    }
+
+    fun clearFilteredProducts() {
+        _filteredProduct.value = emptyList()
     }
 
     //This functions give us info like goodAfternoon, Good morning, good evening...

@@ -1,7 +1,6 @@
 package com.saurav.boozebuddy.screens.product
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
@@ -42,8 +40,6 @@ import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
-import com.saurav.boozebuddy.ui.theme.lightGrey
-import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.HomeViewModel
 
@@ -73,9 +69,9 @@ fun ProductListingScreen(
         }
         item {
             if(filteredProducts.isEmpty()){
-                ProductGridView(navHostController, productsJson, brandName, brandId)
+                ProductGridView(navHostController, productsJson, brandName, brandId, homeViewModel)
             }else{
-                ProductGridView(navHostController, filteredProducts, brandName, brandId)
+                ProductGridView(navHostController, filteredProducts, brandName, brandId, homeViewModel)
             }
 
         }
@@ -136,18 +132,19 @@ private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) 
             .border(1.dp, colors.secondary, RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.textFieldColors(
-            textColor = colors.secondary,
+            textColor = Color.Black,
             containerColor = Color.White,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
+            disabledIndicatorColor = Color.Transparent,
+            cursorColor = Color.Black
         )
     )
     Spacer(modifier = Modifier.height(25.dp))
 }
 
 @Composable
-fun ProductGridView(navController: NavHostController, productData: List<Product>, brandName: String?, brandId: String?) {
+fun ProductGridView(navController: NavHostController, productData: List<Product>, brandName: String?, brandId: String?, homeViewModel: HomeViewModel) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -168,7 +165,7 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
                             modifier = Modifier.weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            GridItem(item, navController, brandName, brandId)
+                            GridItem(item, navController, brandName, brandId, homeViewModel)
                             Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
@@ -184,7 +181,7 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
 }
 
 @Composable
-fun GridItem(item: Product, navHostController: NavHostController, passedBrandName: String?, passedBrandId: String?) {
+fun GridItem(item: Product, navHostController: NavHostController, passedBrandName: String?, passedBrandId: String?, homeViewModel: HomeViewModel) {
     Box(
         modifier = Modifier
             .width(170.dp)
@@ -201,6 +198,7 @@ fun GridItem(item: Product, navHostController: NavHostController, passedBrandNam
                 val brandName = Uri.encode(Gson().toJson(passedBrandName))
                 val brandId = Uri.encode(Gson().toJson(passedBrandId))
                 navHostController.navigate("${NavRoute.ProductDetail.route}/${productData}/${brandName}/${brandId}")
+                homeViewModel.clearFilteredProducts()
             },
         contentAlignment = Alignment.Center
     ) {
