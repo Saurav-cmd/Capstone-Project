@@ -10,9 +10,11 @@ class FavouritesImpl @Inject constructor(private val firestoreHelper: FirestoreH
         productName: String,
         brandName: String,
         productImage: String,
+        productId: String,
+        brandId: String,
         callback: (Boolean, String?) -> Unit
     ) {
-        firestoreHelper.storeUSerFavourites(productName, brandName, productImage){success, errMsg->
+        firestoreHelper.storeUSerFavourites(productName, brandName, productImage, productId, brandId){success, errMsg->
             callback(success,errMsg)
         }
     }

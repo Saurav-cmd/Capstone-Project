@@ -5,6 +5,7 @@ package com.saurav.boozebuddy.app_navigation
 
 import FavouritesListPage
 import SignupPage
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -38,28 +39,32 @@ object NavGraph {
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
 //            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController) }
-            composable(NavRoute.ProductListing.route + "/{products}") { backStackEntry ->
+            composable(NavRoute.ProductListing.route + "/{products}/{brandName}/{brandId}") { backStackEntry ->
                 val productsJson = backStackEntry.arguments?.getString("products")
+                val brandName = backStackEntry.arguments?.getString("brandName")
+                val brandId = backStackEntry.arguments?.getString("brandId")
+
                 val productsListType = object : TypeToken<List<Product>>() {}.type
                 val products: List<Product> = Gson().fromJson(productsJson, productsListType)
-                ProductListingScreen(navController, products, homeViewModel)
+
+                ProductListingScreen(navController, products, brandName ?: "", brandId ?: "", homeViewModel)
+            }
+            composable(
+                route = NavRoute.ProductDetail.route + "/{productData}/{brandName}/{brandId}",
+            ) { backStackEntry ->
+                val productJson = backStackEntry.arguments?.getString("productData")
+                val brandNameJson = backStackEntry.arguments?.getString("brandName")
+                val brandIdJson = backStackEntry.arguments?.getString("brandId")
+
+                val productType = object : TypeToken<Product>() {}.type
+                val productData: Product = Gson().fromJson(productJson, productType)
+                val brandName: String = Gson().fromJson(brandNameJson, String::class.java)
+                val brandId: String = Gson().fromJson(brandIdJson, String::class.java)
+
+                Log.e("When passing the data: ", "$brandId ${productData.productId}")
+                ProductsDetailPage(navController, favouritesViewModel, productData, brandName, brandId)
             }
 
-            composable(
-                route = NavRoute.ProductDetail.route + "/{productId}/{productName}/{productImage}/{productDetail}",
-                arguments = listOf(
-                    navArgument("productId") { type = NavType.StringType },
-                    navArgument("productName") { type = NavType.StringType },
-                    navArgument("productImage") { type = NavType.StringType },
-                    navArgument("productDetail") { type = NavType.StringType }
-                )
-            ) { backStackEntry ->
-                val productId = backStackEntry.arguments?.getString("productId")
-                val productName = backStackEntry.arguments?.getString("productName")
-                val productImage = backStackEntry.arguments?.getString("productImage")
-                val productDetail = backStackEntry.arguments?.getString("productDetail")
-                ProductsDetailPage(navController,favouritesViewModel,productId, productName, productImage, productDetail)
-            }
         }
     }
 }

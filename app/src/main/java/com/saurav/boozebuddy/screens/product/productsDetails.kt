@@ -1,11 +1,9 @@
 package com.saurav.boozebuddy.screens.product
 
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +13,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,40 +25,47 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.google.gson.Gson
-import com.saurav.boozebuddy.R
-import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
+import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 
 @Composable
-fun ProductsDetailPage(navHostController: NavHostController,favouritesViewModel: FavouritesViewModel,productId: String?, productName: String?, productImage: String?, productDetail: String?) {
+fun ProductsDetailPage(
+    navHostController: NavHostController,
+    favouritesViewModel: FavouritesViewModel,
+    productInfo: Product,
+    brandName: String?,
+    brandId: String?
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = lightGrey)
     ) {
         item {
-            ProductImage(navHostController,productImage?.trim('"'))
+            ProductImage(navHostController, productInfo.productImage)
         }
         item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        item {
-            ProductDetailsSection(productName, productDetail, favouritesViewModel, productImage?:"")
+            ProductDetailsSection(
+                productInfo.productName,
+                productInfo.productDescription,
+                favouritesViewModel,
+                productInfo.productImage ?: "",
+                productInfo.productId,
+                brandName,
+                brandId
+            )
         }
     }
 }
-
 
 
 @Composable
@@ -66,22 +73,9 @@ fun ProductImage(navController: NavHostController, productImage: String?) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(500.dp)
-            .padding(16.dp).background(color = Color.LightGray)
+            .height(350.dp)
+            .background(color = Color.LightGray)
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back",
-            tint = colors.secondary,
-            modifier = Modifier
-                .size(30.dp)
-                .align(Alignment.TopStart)
-                .clickable {
-                    navController.navigateUp()
-                    Log.e("THis is url", "$productImage")
-                }
-        )
-        Text(text = "$productImage", color = Color.Black)
 
         if ((productImage ?: "").isEmpty()) {
             Image(
@@ -96,16 +90,37 @@ fun ProductImage(navController: NavHostController, productImage: String?) {
                 painter = rememberAsyncImagePainter(model = productImage),
                 contentDescription = "Product Image",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxSize()
             )
         }
+
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Back",
+            tint = colors.secondary,
+            modifier = Modifier
+                .size(50.dp)
+                .align(Alignment.TopStart)
+                .padding(start = 20.dp, top = 10.dp)
+                .clickable {
+                    navController.navigateUp()
+                    Log.e("THis is url", "$productImage")
+                }
+        )
     }
 }
 
 
-
 @Composable
-fun ProductDetailsSection(productName:String?, productDetail: String?, favouritesViewModel: FavouritesViewModel, productImage:String) {
+fun ProductDetailsSection(
+    productName: String?,
+    productDetail: String?,
+    favouritesViewModel: FavouritesViewModel,
+    productImage: String,
+    productId: String?,
+    brandName: String?,
+    brandId: String?
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,7 +133,15 @@ fun ProductDetailsSection(productName:String?, productDetail: String?, favourite
                 .padding(horizontal = 20.dp, vertical = 10.dp)
                 .fillMaxSize()
         ) {
-            Details(productName, productDetail, favouritesViewModel, productImage)
+            Details(
+                productName,
+                productDetail,
+                favouritesViewModel,
+                productImage,
+                productId,
+                brandName,
+                brandId
+            )
             Spacer(modifier = Modifier.height(25.dp))
 //            PriceAndQuantity()
             Spacer(modifier = Modifier.weight(1f)) // Fill remaining space
@@ -129,8 +152,17 @@ fun ProductDetailsSection(productName:String?, productDetail: String?, favourite
 
 
 @Composable
-private fun Details(productName: String?, productDetail: String?, favouritesViewModel: FavouritesViewModel, productImage: String) {
+private fun Details(
+    productName: String?,
+    productDetail: String?,
+    favouritesViewModel: FavouritesViewModel,
+    productImage: String,
+    productId: String?,
+    brandName: String?,
+    brandId: String?
+) {
     val context = LocalContext.current
+    val isAddingToFavourite by favouritesViewModel.isStoringFavourites.observeAsState(initial = false)
     Column(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -152,18 +184,29 @@ private fun Details(productName: String?, productDetail: String?, favouritesView
                     contentColor = Color.Red
                 ),
                 onClick = {
+                    Log.e("In Click function: ", "$productId $brandId")
                     // Write function here
-                    favouritesViewModel.storeIsFavourites(productName?:"", "Vodka", productImage){success, errMsg ->
-                        if(success){
+                    favouritesViewModel.storeIsFavourites(
+                        productName ?: "",
+                        brandName ?: "",
+                        productImage,
+                        productId ?: "",
+                        brandId ?: ""
+                    ) { success, errMsg ->
+                        if (success) {
                             Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                        }else{
+                        } else {
                             //error
                             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
             ) {
-                Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favourites")
+                if (isAddingToFavourite) CircularProgressIndicator() else Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favourites"
+                )
+
             }
         }
         Spacer(modifier = Modifier.height(5.dp))
@@ -251,19 +294,28 @@ private fun QuantityBoxDesign(value: String) {
 
 @Composable
 fun AddCartButton() {
-    Button(
-        onClick = {
-
-        },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = secondaryColor,
-            contentColor = primaryColor
-        ),
-        modifier = Modifier.padding(horizontal = 40.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(16.dp) // Adjust padding as needed
     ) {
-        Text(
-            text = "Add to Wishlist",
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
-        )
+        Button(
+            onClick = {
+                // Handle button click
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = secondaryColor,
+                contentColor = primaryColor
+            ),
+            modifier = Modifier
+                .align(Alignment.BottomCenter) // Aligns the button at the bottom center
+                .padding(horizontal = 40.dp) // Adjust horizontal padding if necessary
+        ) {
+            Text(
+                text = "Add to Wishlist",
+                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+            )
+        }
     }
 }

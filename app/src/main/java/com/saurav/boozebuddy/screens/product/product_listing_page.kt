@@ -45,6 +45,8 @@ import com.saurav.boozebuddy.view_models.HomeViewModel
 fun ProductListingScreen(
     navHostController: NavHostController,
     productsJson: List<Product>,
+    brandName: String?,
+    brandId: String?,
     homeViewModel: HomeViewModel
 ) {
     val filteredProducts by homeViewModel.filteredProduct.observeAsState(initial = emptyList())
@@ -65,9 +67,9 @@ fun ProductListingScreen(
         }
         item {
             if(filteredProducts.isEmpty()){
-                ProductGridView(navHostController, productsJson)
+                ProductGridView(navHostController, productsJson, brandName, brandId)
             }else{
-                ProductGridView(navHostController, filteredProducts)
+                ProductGridView(navHostController, filteredProducts, brandName, brandId)
             }
 
         }
@@ -139,7 +141,7 @@ private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) 
 }
 
 @Composable
-fun ProductGridView(navController: NavHostController, productData: List<Product>) {
+fun ProductGridView(navController: NavHostController, productData: List<Product>, brandName: String?, brandId: String?) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -160,7 +162,7 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
                             modifier = Modifier.weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            GridItem(item, navController)
+                            GridItem(item, navController, brandName, brandId)
                             Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
@@ -176,7 +178,7 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
 }
 
 @Composable
-fun GridItem(item: Product, navHostController: NavHostController) {
+fun GridItem(item: Product, navHostController: NavHostController, passedBrandName: String?, passedBrandId: String?) {
     Box(
         modifier = Modifier
             .width(170.dp)
@@ -190,11 +192,14 @@ fun GridItem(item: Product, navHostController: NavHostController) {
             .background(color = Color.Gray.copy(alpha = 0.1f))
             .clickable {
 //                navHostController.navigate(NavRoute.ProductDetail.route)
-                val productName = Uri.encode(Gson().toJson(item.productName))
-                val productImage = Uri.encode(Gson().toJson(item.productImage))
-                val productID = Uri.encode(Gson().toJson(item.productId))
-                val productDetail = Uri.encode(Gson().toJson(item.productDescription))
-                navHostController.navigate("${NavRoute.ProductDetail.route}/${productID}/${productName}/${productImage}/${productDetail}")
+//                val productName = Uri.encode(Gson().toJson(item.productName))
+//                val productImage = Uri.encode(Gson().toJson(item.productImage))
+//                val productID = Uri.encode(Gson().toJson(item.productId))
+//                val productDetail = Uri.encode(Gson().toJson(item.productDescription))
+                val productData = Uri.encode(Gson().toJson(item))
+                val brandName = Uri.encode(Gson().toJson(passedBrandName))
+                val brandId = Uri.encode(Gson().toJson(passedBrandId))
+                navHostController.navigate("${NavRoute.ProductDetail.route}/${productData}/${brandName}/${brandId}")
             },
         contentAlignment = Alignment.Center
     ) {

@@ -16,21 +16,24 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             val brandsCollection = firestore.collection("brands")
             val brandsSnapshot = brandsCollection.get().await()
             brandsSnapshot.documents.mapNotNull { document ->
-                val brand = document.toObject(BrandModel::class.java)
+                val brand = document.toObject(BrandModel::class.java)?.copy(brandId = document.id)
                 if (brand != null) {
                     val productsSnapshot = document.reference.collection("products").get().await()
-                    val products = productsSnapshot.toObjects(Product::class.java)
+                    val products = productsSnapshot.documents.mapNotNull { productDocument ->
+                        productDocument.toObject(Product::class.java)?.copy(productId = productDocument.id)
+                    }
                     brand.copy(products = products)
                 } else {
-                    Log.e("FirestoreHelper", "Brand document is null")
+                    //brand is empty
                     null
                 }
             }
         } catch (e: Exception) {
-            Log.e("FirestoreHelper", "Error fetching brands with products: ${e.message}", e)
+            ErrorHandler.getErrorMessage(e)
             emptyList()
         }
     }
+
 
     suspend fun fetchUserInfo(): UserModel? {
         return try {
@@ -56,6 +59,8 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         productName: String,
         brandName: String,
         productImage: String,
+        productId: String,
+        brandId: String,
         callback: (Boolean, String?) -> Unit
     ) {
         try {
@@ -63,10 +68,13 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             val uid = currentUser.uid
 
             val favourite = hashMapOf(
+                "productId" to productId.trim(),
                 "productName" to productName,
                 "brandName" to brandName,
-                "productImage" to productImage
+                "productImage" to productImage,
+                "brandId" to brandId.trim()
             )
+            Log.e("This is the body of favourites: ", "$favourite")
             firestore.collection("users")
                 .document(uid)
                 .collection("favourites")
