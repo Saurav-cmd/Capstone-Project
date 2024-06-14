@@ -7,14 +7,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurav.boozebuddy.api_services.ErrorHandler
 import com.saurav.boozebuddy.impl.favourites_impl.FavouritesImpl
+import com.saurav.boozebuddy.models.UserFavouritesModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavouritesViewModel @Inject constructor(private val favouritesImpl: FavouritesImpl) : ViewModel() {
+class FavouritesViewModel @Inject constructor(private val favouritesImpl: FavouritesImpl) :
+    ViewModel() {
     private val _isStoringFavourites = MutableLiveData<Boolean>()
     val isStoringFavourites: LiveData<Boolean> get() = _isStoringFavourites
+
+    private val _isFetchingUserFavourites = MutableLiveData<Boolean>()
+    val isFetchingUserFavourites: LiveData<Boolean> get() = _isFetchingUserFavourites
+
+    private val _userFavourites = MutableLiveData<List<UserFavouritesModel>>()
+    val userFavourites: LiveData<List<UserFavouritesModel>> get() = _userFavourites
 
     fun storeIsFavourites(
         productName: String,
@@ -24,22 +32,37 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
         brandId: String,
         callback: (Boolean, String?) -> Unit
     ) {
-        Log.e("Viewmodel favourites: ", "$productId $brandId")
-        try{
-           _isStoringFavourites.value = true
-           viewModelScope.launch {
-               favouritesImpl.addToFavourites(productName, brandName, productImage, productId, brandId){ success, errMsg ->
-                   run {
-                      callback(success, errMsg)
-                   }
+        _isStoringFavourites.value = true
+        viewModelScope.launch {
+            try {
+                favouritesImpl.addToFavourites(
+                    productName,
+                    brandName,
+                    productImage,
+                    productId,
+                    brandId
+                ) { success, errMsg ->
+                    callback(success, errMsg)
+                }
+            } catch (e: Exception) {
+                ErrorHandler.getErrorMessage(e)
+            } finally {
+                _isStoringFavourites.value = false
+            }
+        }
+    }
 
-               }
-           }
-        }catch (e:Exception){
-            _isStoringFavourites.value = false
+    fun fetchUserFavourites() {
+        try {
+            viewModelScope.launch {
+                _isFetchingUserFavourites.value = true
+                _userFavourites.value = favouritesImpl.getUserFavourites()
+            }
+        } catch (e: Exception) {
+            _isFetchingUserFavourites.value = false
             ErrorHandler.getErrorMessage(e)
-        }finally {
-            _isStoringFavourites.value = false
+        } finally {
+            _isFetchingUserFavourites.value = false
         }
     }
 }

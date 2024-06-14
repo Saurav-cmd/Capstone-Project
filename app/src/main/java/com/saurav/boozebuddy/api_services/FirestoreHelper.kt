@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.Product
+import com.saurav.boozebuddy.models.UserFavouritesModel
 import com.saurav.boozebuddy.models.UserModel
 import kotlinx.coroutines.tasks.await
 
@@ -20,7 +21,8 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                 if (brand != null) {
                     val productsSnapshot = document.reference.collection("products").get().await()
                     val products = productsSnapshot.documents.mapNotNull { productDocument ->
-                        productDocument.toObject(Product::class.java)?.copy(productId = productDocument.id)
+                        productDocument.toObject(Product::class.java)
+                            ?.copy(productId = productDocument.id)
                     }
                     brand.copy(products = products)
                 } else {
@@ -87,4 +89,33 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             ErrorHandler.getErrorMessage(e)
         }
     }
+
+    suspend fun fetchUserFavourites(): List<UserFavouritesModel> {
+        return try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            val favouritesSnapshot = firestore.collection("users")
+                .document(uid)
+                .collection("favourites")
+                .get()
+                .await()
+
+            // Map the documents to UserFavouritesModel and check if it's null before adding to the list
+            val favouritesList = favouritesSnapshot.documents.mapNotNull { document ->
+                val favourite = document.toObject(UserFavouritesModel::class.java)
+                favourite?.copy(id = document.id)
+            }
+
+            Log.d("Favourite data", favouritesList.toString()) // Log the fetched favourites list
+            favouritesList
+        } catch (e: Exception) {
+            Log.e("Fetch Favourites", "Error fetching user favourites: ${e.message}")
+            emptyList() // Return an empty list in case of an error
+        }
+    }
+
+
+
+
 }

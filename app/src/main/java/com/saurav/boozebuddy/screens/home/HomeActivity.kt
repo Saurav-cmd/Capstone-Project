@@ -267,7 +267,6 @@ fun TopBrandsGridView(navController: NavHostController, brands: List<BrandModel>
 
 @Composable
 fun GridItem(brandData: BrandModel, navController: NavHostController) {
-    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .width(100.dp)
