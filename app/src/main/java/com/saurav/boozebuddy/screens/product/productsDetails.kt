@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
@@ -77,22 +79,25 @@ fun ProductImage(navController: NavHostController, productImage: String?) {
             .background(color = Color.LightGray)
     ) {
 
-        if ((productImage ?: "").isEmpty()) {
-            Image(
-                painter = painterResource(id = ImagesConst.simrsOff),
-                contentDescription = "Products Details Here",
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxWidth()
+        val painter =
+            rememberAsyncImagePainter(
+                ImageRequest.Builder // Placeholder image resource
+                // Image to show in case of loading failure
+                    (LocalContext.current).data(data = productImage)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        crossfade(true)
+                        placeholder(ImagesConst.people)
+                        error(ImagesConst.people)
+                        size(Size.ORIGINAL)
+                    }).build()
             )
-        } else {
-            Image(
-                painter = rememberAsyncImagePainter(model = productImage),
-                contentDescription = "Product Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+
+        Image(
+            painter = painter,
+            contentDescription = "Product Image",
+            contentScale = ContentScale.Crop, // Maintain aspect ratio and crop if needed
+            modifier = Modifier.fillMaxSize() // Take full height and width
+        )
 
         Icon(
             imageVector = Icons.Default.ArrowBack,

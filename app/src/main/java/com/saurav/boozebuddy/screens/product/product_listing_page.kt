@@ -2,6 +2,7 @@ package com.saurav.boozebuddy.screens.product
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,14 +27,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.google.gson.Gson
 import com.saurav.boozebuddy.app_navigation.NavRoute
+import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.ui.theme.lightGrey
@@ -191,11 +197,6 @@ fun GridItem(item: Product, navHostController: NavHostController, passedBrandNam
             .clip(RoundedCornerShape(20.dp))
             .background(color = Color.Gray.copy(alpha = 0.1f))
             .clickable {
-//                navHostController.navigate(NavRoute.ProductDetail.route)
-//                val productName = Uri.encode(Gson().toJson(item.productName))
-//                val productImage = Uri.encode(Gson().toJson(item.productImage))
-//                val productID = Uri.encode(Gson().toJson(item.productId))
-//                val productDetail = Uri.encode(Gson().toJson(item.productDescription))
                 val productData = Uri.encode(Gson().toJson(item))
                 val brandName = Uri.encode(Gson().toJson(passedBrandName))
                 val brandId = Uri.encode(Gson().toJson(passedBrandId))
@@ -203,13 +204,27 @@ fun GridItem(item: Product, navHostController: NavHostController, passedBrandNam
             },
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(
-            model = item.productImage,
+
+        val painter =
+            rememberAsyncImagePainter(
+                ImageRequest.Builder // Placeholder image resource
+            // Image to show in case of loading failure
+                (LocalContext.current).data(data = item.productImage)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(ImagesConst.people)
+                    error(ImagesConst.people)
+                    size(Size.ORIGINAL)
+                }).build()
+            )
+
+        Image(
+            painter = painter,
             contentDescription = item.productDescription,
-            contentScale = ContentScale.FillHeight, // Change contentScale to FillBounds
-            modifier = Modifier
-                .fillMaxHeight() // Use fillMaxSize to match the size of the parent Box
+            contentScale = ContentScale.Crop, // Maintain aspect ratio and crop if needed
+            modifier = Modifier.fillMaxSize() // Take full height and width
         )
+
 
         Box(
             modifier = Modifier

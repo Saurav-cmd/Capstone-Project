@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils
+import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 
 @Composable
@@ -62,7 +63,7 @@ private fun TopContainer(navController: NavHostController) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
-            tint = ThemeUtils.colors.secondary,
+            tint = colors.secondary,
             modifier = Modifier
                 .padding(10.dp)
                 .size(30.dp)
@@ -75,7 +76,7 @@ private fun TopContainer(navController: NavHostController) {
         Text(
             text = "Favourites",
             style = TextStyle(
-                color = ThemeUtils.colors.secondary,
+                color = colors.secondary,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             ),
