@@ -11,7 +11,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -20,12 +19,11 @@ import com.exyte.animatednavbar.animation.balltrajectory.Straight
 import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.utils.noRippleClickable
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
-import com.saurav.boozebuddy.screens.cart.CartPage
 import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.screens.notification.NotificationPage
 import com.saurav.boozebuddy.screens.profile.ProfilePage
+import com.saurav.boozebuddy.screens.wishlist.WishListPage
 import com.saurav.boozebuddy.ui.theme.bottomNavUnSelectedIconColor
-import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
 
@@ -80,7 +78,7 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
                     NotificationPage()
                 }
                 2 -> {
-                    CartPage()
+                    WishListPage()
                 }
                 else -> {
                     ProfilePage(authViewModel, navController, homeViewModel)
