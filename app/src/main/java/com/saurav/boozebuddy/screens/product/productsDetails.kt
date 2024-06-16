@@ -255,7 +255,7 @@ private fun Description(productDetail: String?) {
         text = "$productDetail",
         style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Light),
         color = Color.Black,
-        modifier = Modifier.fillMaxWidth(fraction = 0.5f)
+//        modifier = Modifier.fillMaxWidth(fraction = 0.5f)
     )
 }
 

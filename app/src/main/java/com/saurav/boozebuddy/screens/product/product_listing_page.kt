@@ -11,10 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -267,8 +265,8 @@ fun GridItem(item: Product, navHostController: NavHostController, passedBrandNam
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            IconButton(
-                onClick = { /*TODO*/ },
+            /*IconButton(
+                onClick = { *//*TODO*//* },
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 Icon(
@@ -276,7 +274,7 @@ fun GridItem(item: Product, navHostController: NavHostController, passedBrandNam
                     contentDescription = "Add to Cart",
                     tint = Color.White,
                 )
-            }
+            }*/
         }
     }
 }
