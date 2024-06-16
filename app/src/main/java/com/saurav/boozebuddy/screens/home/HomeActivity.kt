@@ -57,7 +57,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     ) {
         item { GreetingContainer(navController, homeViewModel) }
         item { Spacer(modifier = Modifier.height(10.dp)) }
-        item { SearchField("Search your favourite brand") }
+//        item { SearchField("Search your favourite brand") }
         item { Spacer(modifier = Modifier.height(25.dp)) }
         item { Banner() }
         item { Spacer(modifier = Modifier.height(25.dp)) }
