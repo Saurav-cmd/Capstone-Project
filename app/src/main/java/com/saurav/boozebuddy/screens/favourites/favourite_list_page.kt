@@ -24,6 +24,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -32,13 +33,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.UserFavouritesModel
@@ -47,7 +52,11 @@ import com.saurav.boozebuddy.view_models.FavouritesViewModel
 
 @Composable
 fun FavouritesListPage(navController: NavHostController, favouritesViewModel: FavouritesViewModel) {
-    favouritesViewModel.fetchUserFavourites()
+    // Call fetchUserFavourites only once when the composable is first launched
+    LaunchedEffect(Unit) {
+        favouritesViewModel.fetchUserFavourites()
+    }
+
     val isLoadingFavourites by favouritesViewModel.isFetchingUserFavourites.observeAsState(initial = false)
     val favouritesData by favouritesViewModel.userFavourites.observeAsState(initial = emptyList())
 
@@ -74,23 +83,25 @@ fun FavouritesListPage(navController: NavHostController, favouritesViewModel: Fa
                 Text(text = "No Favourites!", fontSize = 18.sp, color = colors.error)
             }
         } else {
-            FavouritesList(favouritesData)
+            FavouritesList(favouritesData, favouritesViewModel)
         }
     }
 }
 
+
 @Composable
-private fun FavouritesList(userFavourites: List<UserFavouritesModel>) {
+private fun FavouritesList(userFavourites: List<UserFavouritesModel>, viewModel: FavouritesViewModel) {
     LazyColumn(content = {
         items(count = userFavourites.size) { index ->
-            FavouritesDesign(userFavourites[index])
+            FavouritesDesign(userFavourites[index], viewModel)
             Spacer(modifier = Modifier.height(15.dp))
         }
     })
 }
 
+
 @Composable
-private fun FavouritesDesign(favourite: UserFavouritesModel) {
+private fun FavouritesDesign(favourite: UserFavouritesModel, viewModel: FavouritesViewModel) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,63 +110,77 @@ private fun FavouritesDesign(favourite: UserFavouritesModel) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-                modifier = Modifier
-                    .width(70.dp)
-                    .height(70.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .border(
-                        width = 1.5.dp,
-                        color = colors.secondary,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-            )
-            {
-                val painter =
-                    rememberAsyncImagePainter(ImageRequest.Builder // Placeholder image resource
-                    // Image to show in case of loading failure
-                        (LocalContext.current).data(data = favourite.productImage)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                            placeholder(ImagesConst.people)
-                            error(ImagesConst.people)
-                        }).build()
-                    )
-
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .fillMaxHeight()
-                )
-            }
-            Column {
-                Text(
-                    text = favourite.productName,
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = secondaryColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = favourite.brandName.removePrefix("\"").removeSuffix("\""),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Gray
-                    )
-                )
+                        .width(70.dp)
+                        .height(70.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(
+                            width = 1.5.dp,
+                            color = colors.secondary,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                ) {
+                    val painter =
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = favourite.productImage)
+                                .apply {
+                                    crossfade(true)
+                                    placeholder(ImagesConst.people)
+                                    error(ImagesConst.people)
+                                }
+                                .build()
+                        )
 
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Column {
+                    Text(
+                        text = favourite.productName,
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = secondaryColor
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = favourite.brandName.removePrefix("\"").removeSuffix("\""),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Gray
+                        )
+                    )
+                }
             }
+            Icon(
+                painter = painterResource(id = R.drawable.delete),
+                contentDescription = "Delete",
+                tint = Color.Red,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        viewModel.deleteFavourite(favourite)
+                    }
+            )
         }
     }
 }
+
+
 
 
 

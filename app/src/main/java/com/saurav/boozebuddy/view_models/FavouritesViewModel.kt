@@ -65,4 +65,23 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
             _isFetchingUserFavourites.value = false
         }
     }
+
+    fun deleteFavourite(favourite: UserFavouritesModel) {
+        viewModelScope.launch {
+            try {
+                Log.d("FavouritesViewModel", "Attempting to delete favourite with id: ${favourite.id}")
+                favouritesImpl.deleteFavourite(favourite) { success, errorMsg ->
+                    if (success) {
+                        Log.d("FavouritesViewModel", "Successfully deleted favourite with id: ${favourite.id}")
+                        // Update the list of favourites after deletion
+                        _userFavourites.value = _userFavourites.value?.filter { it.id != favourite.id }
+                    } else {
+                        Log.e("FavouritesViewModel", "Error deleting favourite: $errorMsg")
+                    }
+                }
+            } catch (e: Exception) {
+                ErrorHandler.getErrorMessage(e)
+            }
+        }
+    }
 }
