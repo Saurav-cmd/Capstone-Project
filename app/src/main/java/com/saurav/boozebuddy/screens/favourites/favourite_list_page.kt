@@ -101,6 +101,8 @@ private fun FavouritesList(userFavourites: List<UserFavouritesModel>, viewModel:
 @Composable
 private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel: FavouritesViewModel) {
     val context = LocalContext.current
+    val isDeletingFav by favouritesViewModel.deletingFavourites.observeAsState(initial = false)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -166,23 +168,33 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
                     )
                 }
             }
-            Icon(
-                painter = painterResource(id = R.drawable.delete),
-                contentDescription = "Delete",
-                tint = Color.Red,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        favouritesViewModel.deleteFavourite(favourite.id){success, errMsg ->
-                            if(success){
-                                Toast.makeText(context, "Successfully deleted", Toast.LENGTH_SHORT).show()
-                                favouritesViewModel.fetchUserFavourites()
-                            }else{
-                                Toast.makeText(context, "Error cannot delete", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-            )
+          if(isDeletingFav){
+              CircularProgressIndicator(
+                  color = colors.secondary
+              )
+          }else{
+              Icon(
+                  painter = painterResource(id = R.drawable.delete),
+                  contentDescription = "Delete",
+                  tint = Color.Red,
+                  modifier = Modifier
+                      .size(24.dp)
+                      .clickable {
+                          favouritesViewModel.deleteFavourite(favourite.id) { success, errMsg ->
+                              if (success) {
+                                  Toast
+                                      .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
+                                      .show()
+                                  favouritesViewModel.fetchUserFavourites()
+                              } else {
+                                  Toast
+                                      .makeText(context, "Error cannot delete", Toast.LENGTH_SHORT)
+                                      .show()
+                              }
+                          }
+                      }
+              )
+          }
         }
     }
 }
