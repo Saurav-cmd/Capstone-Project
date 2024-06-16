@@ -5,13 +5,31 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -188,28 +206,41 @@ private fun Details(
                     contentColor = Color.Red
                 ),
                 onClick = {
-                    Log.e("In Click function: ", "$productId $brandId")
-                    // Write function here
-                    favouritesViewModel.storeIsFavourites(
-                        productName ?: "",
-                        brandName ?: "",
-                        productImage,
-                        productId ?: "",
-                        brandId ?: ""
-                    ) { success, errMsg ->
-                        if (success) {
-                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                        } else {
-                            //error
-                            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                  if(favouritesViewModel.checkIfAlreadyFavourite(productId?:"")){
+                      Toast.makeText(context, "Already in Favourites List", Toast.LENGTH_SHORT).show()
+                  }else{
+                      favouritesViewModel.storeIsFavourites(
+                          productName ?: "",
+                          brandName ?: "",
+                          productImage,
+                          productId ?: "",
+                          brandId ?: ""
+                      ) { success, errMsg ->
+                          if (success) {
+                              Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                              favouritesViewModel.checkIfAlreadyFavourite(productId ?: "")
+                          } else {
+                              //error
+                              Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                          }
+                      }
+                  }
+
                 }
             ) {
-                if (isAddingToFavourite) CircularProgressIndicator() else Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Favourites"
-                )
+                if(favouritesViewModel.checkIfAlreadyFavourite(productId?:"")){
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Favourites"
+                    )
+                }else{
+                    if (isAddingToFavourite) CircularProgressIndicator() else Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = "Favourites"
+                    )
+                }
+
+
 
             }
         }

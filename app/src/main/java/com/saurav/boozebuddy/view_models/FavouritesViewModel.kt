@@ -86,4 +86,11 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
             _deletingFavourites.value = false
         }
     }
+
+    //check if the user has already favourite or not
+    fun checkIfAlreadyFavourite(productId: String):Boolean{
+        fetchUserFavourites()
+       val favouritesList = _userFavourites.value
+        return favouritesList?.any{ it.productId == productId} ?: false
+    }
 }
