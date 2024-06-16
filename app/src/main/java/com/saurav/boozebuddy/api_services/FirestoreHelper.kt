@@ -24,6 +24,7 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                         productDocument.toObject(Product::class.java)
                             ?.copy(productId = productDocument.id)
                     }
+                    Log.e("THis is brands data","${brand.brandName}")
                     brand.copy(products = products)
                 } else {
                     //brand is empty
@@ -115,6 +116,26 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         }
     }
 
+
+    suspend fun deleteFavouriteForUser(favouriteId: String, callback: (Boolean, String?) -> Unit) {
+        try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            // Get a reference to the user's document
+            val userRef = firestore.collection("users").document(uid)
+
+            // Get a reference to the favorite document to be deleted
+            val favouriteDocRef = userRef.collection("favourites").document(favouriteId)
+
+            // Delete the favorite document
+            favouriteDocRef.delete().await()
+            callback(true, null)
+        } catch (e: Exception) {
+            Log.e("FavouritesImpl", "Error deleting favourite: ${e.message}")
+            callback(false, e.message)
+        }
+    }
 
 
 

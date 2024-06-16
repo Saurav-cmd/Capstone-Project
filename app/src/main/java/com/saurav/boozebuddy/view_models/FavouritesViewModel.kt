@@ -1,6 +1,5 @@
 package com.saurav.boozebuddy.view_models
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,6 +22,9 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
 
     private val _userFavourites = MutableLiveData<List<UserFavouritesModel>>()
     val userFavourites: LiveData<List<UserFavouritesModel>> get() = _userFavourites
+
+    private val _deletingFavourites = MutableLiveData<Boolean>()
+    val deletingFavourites:LiveData<Boolean> get() = _deletingFavourites
 
     fun storeIsFavourites(
         productName: String,
@@ -66,22 +68,22 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
         }
     }
 
-    fun deleteFavourite(favourite: UserFavouritesModel) {
-        viewModelScope.launch {
-            try {
-                Log.d("FavouritesViewModel", "Attempting to delete favourite with id: ${favourite.id}")
-                favouritesImpl.deleteFavourite(favourite) { success, errorMsg ->
-                    if (success) {
-                        Log.d("FavouritesViewModel", "Successfully deleted favourite with id: ${favourite.id}")
-                        // Update the list of favourites after deletion
-                        _userFavourites.value = _userFavourites.value?.filter { it.id != favourite.id }
-                    } else {
-                        Log.e("FavouritesViewModel", "Error deleting favourite: $errorMsg")
-                    }
+    fun deleteFavourite(
+        favouriteId: String,
+        callback: (Boolean, String?) -> Unit
+    ) {
+        try {
+            _deletingFavourites.value = true
+            viewModelScope.launch {
+                favouritesImpl.deleteUserFavourites(favouriteId) { success, errorMsg ->
+                    callback(success, errorMsg)
                 }
-            } catch (e: Exception) {
-                ErrorHandler.getErrorMessage(e)
             }
+        } catch (e: Exception) {
+            _deletingFavourites.value = false
+            ErrorHandler.getErrorMessage(e)
+        } finally {
+            _deletingFavourites.value = false
         }
     }
 }

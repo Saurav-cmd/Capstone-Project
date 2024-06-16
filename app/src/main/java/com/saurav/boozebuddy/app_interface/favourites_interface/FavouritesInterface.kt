@@ -6,4 +6,6 @@ interface FavouritesInterface {
     suspend fun addToFavourites(productName:String,brandName:String,productImage:String,productId: String,
                                 brandId: String,callback: (Boolean, String?) -> Unit)
     suspend fun getUserFavourites() : List<UserFavouritesModel>
+
+    suspend fun deleteUserFavourites(favouriteId: String, callback: (Boolean, String?) -> Unit)
 }
