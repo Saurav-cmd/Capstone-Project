@@ -103,8 +103,8 @@ fun ProductImage(navController: NavHostController, productImage: String?) {
                     (LocalContext.current).data(data = productImage)
                     .apply(block = fun ImageRequest.Builder.() {
                         crossfade(true)
-                        placeholder(ImagesConst.people)
-                        error(ImagesConst.people)
+                        placeholder(ImagesConst.appLogo)
+                        error(ImagesConst.appLogo)
                         size(Size.ORIGINAL)
                     }).build()
             )

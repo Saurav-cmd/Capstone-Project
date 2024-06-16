@@ -287,8 +287,8 @@ fun GridItem(brandData: BrandModel, navController: NavHostController) {
                 (LocalContext.current).data(data = brandData.brandLogo)
                 .apply(block = fun ImageRequest.Builder.() {
                     crossfade(true)
-                    placeholder(ImagesConst.people)
-                    error(ImagesConst.people)
+                    placeholder(ImagesConst.appLogo)
+                    error(ImagesConst.appLogo)
                 }).build()
             )
 

@@ -4,23 +4,28 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.saurav.boozebuddy.app_navigation.NavRoute
-import com.saurav.boozebuddy.constants.ThemeUtils.colors
+import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import kotlinx.coroutines.delay
@@ -59,17 +64,23 @@ fun StylishBBAnimation(onAnimationEnd: () -> Unit) {
         modifier = Modifier.size(200.dp),
         contentAlignment = Alignment.Center
     ) {
-        BasicText(
-            text = "BB",
-            style = TextStyle(
-                fontSize = 100.sp,
-                fontWeight = FontWeight.Bold,
-                color = colors.secondary
-            )
-        )
         CircularProgressIndicator(progress = animatedProgress)
+
+        // Adjust the size of the Box containing the Image to fit inside the circle
+        Box(
+            modifier = Modifier.size(160.dp), // Adjust the size as needed
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = ImagesConst.appLogo),
+                contentDescription = "App Logo",
+                contentScale = ContentScale.Fit, // Fit the image inside the Box
+                modifier = Modifier.fillMaxSize() // Take full height and width
+            )
+        }
     }
 }
+
 
 @Composable
 fun CircularProgressIndicator(progress: Float) {

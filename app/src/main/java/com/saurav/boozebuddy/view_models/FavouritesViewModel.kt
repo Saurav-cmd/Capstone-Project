@@ -26,6 +26,10 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
     private val _deletingFavourites = MutableLiveData<Boolean>()
     val deletingFavourites:LiveData<Boolean> get() = _deletingFavourites
 
+    init {
+        fetchUserFavourites()
+    }
+
     fun storeIsFavourites(
         productName: String,
         brandName: String,

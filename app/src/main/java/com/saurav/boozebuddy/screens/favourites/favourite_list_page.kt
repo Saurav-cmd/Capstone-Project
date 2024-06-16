@@ -50,11 +50,6 @@ import com.saurav.boozebuddy.view_models.FavouritesViewModel
 
 @Composable
 fun FavouritesListPage(navController: NavHostController, favouritesViewModel: FavouritesViewModel) {
-    // Call fetchUserFavourites only once when the composable is first launched
-    LaunchedEffect(Unit) {
-        favouritesViewModel.fetchUserFavourites()
-    }
-
     val isLoadingFavourites by favouritesViewModel.isFetchingUserFavourites.observeAsState(initial = false)
     val favouritesData by favouritesViewModel.userFavourites.observeAsState(initial = emptyList())
 
@@ -134,8 +129,8 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
                                 .data(data = favourite.productImage)
                                 .apply {
                                     crossfade(true)
-                                    placeholder(ImagesConst.people)
-                                    error(ImagesConst.people)
+                                    placeholder(ImagesConst.appLogo)
+                                    error(ImagesConst.appLogo)
                                 }
                                 .build()
                         )
