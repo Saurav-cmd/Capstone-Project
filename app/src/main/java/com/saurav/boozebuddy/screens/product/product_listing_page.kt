@@ -59,7 +59,7 @@ fun ProductListingScreen(
         contentPadding = PaddingValues(vertical = 10.dp)
     ) {
         item {
-            TopContainer(navHostController)
+            TopContainer(navHostController, homeViewModel)
         }
         item {
             SearchBar(homeViewModel, productsJson)
@@ -77,7 +77,7 @@ fun ProductListingScreen(
 }
 
 @Composable
-private fun TopContainer(navController: NavHostController) {
+private fun TopContainer(navController: NavHostController, homeViewModel: HomeViewModel) {
     Box(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
     ) {
@@ -91,6 +91,7 @@ private fun TopContainer(navController: NavHostController) {
                 .align(Alignment.CenterStart)
                 .clickable {
                     navController.navigateUp()
+                    homeViewModel.clearFilteredProducts()
                 }
         )
 
