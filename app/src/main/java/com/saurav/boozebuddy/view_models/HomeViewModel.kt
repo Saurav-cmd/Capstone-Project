@@ -37,26 +37,55 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     private val _banners = MutableLiveData<List<BannerModel>>()
     val banners: LiveData<List<BannerModel>> get() = _banners
 
-    private val _isFetchingBanners = MutableLiveData<Boolean>()
-    val isFetchingBanners: LiveData<Boolean> get() = _isFetchingBanners
+    private val _isLoadingBanners = MutableLiveData<Boolean>()
+    val isLoadingBanners: LiveData<Boolean> get() = _isLoading
 
-    init {
-        fetchBrands()
-        fetchBanners()
+    private var brandsLoaded = false
+    private var bannersLoaded = false
+    private var userLoaded = false
+    private var isLoggedIn = false
+
+    fun initializeData() {
+        if (!brandsLoaded) {
+            fetchBrands()
+            brandsLoaded = true
+        }
+        if (!bannersLoaded) {
+            fetchBanners()
+            bannersLoaded = true
+        }
+        if(!userLoaded){
+            fetchUserInfo()
+            userLoaded = true
+        }
+    }
+
+    fun setLoggedInState(loggedIn: Boolean) {
+        isLoggedIn = loggedIn
+        if (loggedIn) {
+            initializeData()
+        } else {
+            // Reset flags or data when the user logs out
+            brandsLoaded = false
+            bannersLoaded = false
+            userLoaded = false
+        }
     }
 
     //function to fetch the brands
-    private fun fetchBrands() {
+     private fun fetchBrands() {
         try {
-            _isLoading.value = true
             viewModelScope.launch(Dispatchers.IO) {
-                _brands.value = homeImpl.fetchBrands()
+                _isLoading.postValue(true)
+                val brands = homeImpl.fetchBrands()
+                _brands.postValue(brands)
+                _isLoading.postValue(false)
             }
         }catch (e:Exception){
-            _isLoading.value = false
+            _isLoading.postValue(false)
             ErrorHandler.getErrorMessage(e)
         }finally {
-            _isLoading.value = false
+            _isLoading.postValue(false)
         }
     }
 
@@ -75,32 +104,37 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
 
     //Function used to fetch the logged in user info
     fun fetchUserInfo(){
-        try{
-            _isFetchingUserInfo.value = true
-          viewModelScope.launch(Dispatchers.IO) {
-            _userInfo.value =  homeImpl.fetchUserInfo()
-          }
-        }catch (e: Exception){
-            _isFetchingUserInfo.value = false
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                _isFetchingUserInfo.postValue(true)
+                val userInfo = homeImpl.fetchUserInfo()
+                _userInfo.postValue(userInfo) // Use postValue to update LiveData from background thread
+                _isFetchingUserInfo.postValue(false)
+            }
+        } catch (e: Exception) {
+            _isFetchingUserInfo.postValue(false)
             ErrorHandler.getErrorMessage(e)
         }finally {
-            _isFetchingUserInfo.value = false
+            _isFetchingUserInfo.postValue(false)
         }
     }
+
 
     // Function to fetch banners
     private fun fetchBanners() {
         try {
-            _isFetchingBanners.value = true
            viewModelScope.launch(Dispatchers.IO) {
+               _isLoadingBanners.postValue(true)
                homeImpl.fetchBanner { banners ->
                    _banners.postValue(banners ?: emptyList())
-                   _isFetchingBanners.postValue(false)
                }
+               _isLoadingBanners.postValue(true)
            }
         } catch (e: Exception) {
-            _isFetchingBanners.value = false
+            _isLoadingBanners.postValue(false)
             ErrorHandler.getErrorMessage(e)
+        }finally {
+            _isLoadingBanners.postValue(false)
         }
     }
 

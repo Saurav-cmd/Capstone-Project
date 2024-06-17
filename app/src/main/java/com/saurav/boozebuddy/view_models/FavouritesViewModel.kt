@@ -27,10 +27,6 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
     private val _deletingFavourites = MutableLiveData<Boolean>()
     val deletingFavourites:LiveData<Boolean> get() = _deletingFavourites
 
-    init {
-        fetchUserFavourites()
-    }
-
     fun storeIsFavourites(
         productName: String,
         brandName: String,
@@ -39,8 +35,8 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
         brandId: String,
         callback: (Boolean, String?) -> Unit
     ) {
-        _isStoringFavourites.value = true
-        viewModelScope.launch(Dispatchers.IO) {
+        _isStoringFavourites.postValue(true)
+        viewModelScope.launch{
             try {
                 favouritesImpl.addToFavourites(
                     productName,
@@ -54,22 +50,25 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
             } catch (e: Exception) {
                 ErrorHandler.getErrorMessage(e)
             } finally {
-                _isStoringFavourites.value = false
+                _isStoringFavourites.postValue(false)
             }
         }
     }
 
     fun fetchUserFavourites() {
         try {
-            _isFetchingUserFavourites.value = true
+
             viewModelScope.launch(Dispatchers.IO) {
-                _userFavourites.value = favouritesImpl.getUserFavourites()
+                _isFetchingUserFavourites.postValue(true)
+                val favourites = favouritesImpl.getUserFavourites()
+                _userFavourites.postValue(favourites)
+                _isFetchingUserFavourites.postValue(false)
             }
         } catch (e: Exception) {
-            _isFetchingUserFavourites.value = false
+            _isFetchingUserFavourites.postValue(false)
             ErrorHandler.getErrorMessage(e)
         } finally {
-            _isFetchingUserFavourites.value = false
+            _isFetchingUserFavourites.postValue(false)
         }
     }
 
@@ -78,17 +77,18 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
         callback: (Boolean, String?) -> Unit
     ) {
         try {
-            _deletingFavourites.value = true
-            viewModelScope.launch(Dispatchers.IO) {
+            _deletingFavourites.postValue(true)
+            viewModelScope.launch {
                 favouritesImpl.deleteUserFavourites(favouriteId) { success, errorMsg ->
                     callback(success, errorMsg)
                 }
+                _deletingFavourites.postValue(false)
             }
         } catch (e: Exception) {
-            _deletingFavourites.value = false
+            _deletingFavourites.postValue(false)
             ErrorHandler.getErrorMessage(e)
         } finally {
-            _deletingFavourites.value = false
+            _deletingFavourites.postValue(false)
         }
     }
 

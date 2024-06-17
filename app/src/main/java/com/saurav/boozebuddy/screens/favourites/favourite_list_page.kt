@@ -50,6 +50,12 @@ import com.saurav.boozebuddy.view_models.FavouritesViewModel
 
 @Composable
 fun FavouritesListPage(navController: NavHostController, favouritesViewModel: FavouritesViewModel) {
+
+    LaunchedEffect(Unit) {
+      favouritesViewModel.fetchUserFavourites()
+    }
+
+
     val isLoadingFavourites by favouritesViewModel.isFetchingUserFavourites.observeAsState(initial = false)
     val favouritesData by favouritesViewModel.userFavourites.observeAsState(initial = emptyList())
 

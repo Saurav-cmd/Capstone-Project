@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurav.boozebuddy.impl.auth_impl.AuthImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ class AuthViewModel @Inject constructor(private val authImpl: AuthImpl) : ViewMo
     fun loginUser(email: String, password: String, callback: (Boolean, String?) -> Unit){
        try {
            isLoading.value = true
-           viewModelScope.launch(Dispatchers.IO) {
+           viewModelScope.launch {
                authImpl.userLogin(email, password){ success, errMsg ->
                    run {
                        callback(success, errMsg)
@@ -37,7 +36,7 @@ class AuthViewModel @Inject constructor(private val authImpl: AuthImpl) : ViewMo
     fun signUpUser(name:String, email:String, password:String, callback: (Boolean, String?) -> Unit){
         try{
             isCreatingNewUser.value = true
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 authImpl.userSignUp(name, email, password){success, errMsg ->
                     run {
                         callback(success,errMsg)
@@ -54,7 +53,7 @@ class AuthViewModel @Inject constructor(private val authImpl: AuthImpl) : ViewMo
 
     fun logOutUser(){
         isLoggingOut.value = true
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             authImpl.userLogout().run {
                 isLoggingOut.value = false
 

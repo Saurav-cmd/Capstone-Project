@@ -81,7 +81,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostControll
         }
         item {
             Spacer(modifier = Modifier.height(10.dp))
-            BottomContainer(authViewModel, navHostController)
+            BottomContainer(authViewModel, navHostController, homeViewModel)
         }
     }
 }
@@ -198,7 +198,7 @@ private fun TopContainer(homeViewModel: HomeViewModel) {
 
 
 @Composable
-fun BottomContainer( authViewModel: AuthViewModel, navHostController: NavHostController) {
+fun BottomContainer( authViewModel: AuthViewModel, navHostController: NavHostController, homeViewModel: HomeViewModel) {
     var showDialog by remember {
         mutableStateOf(false)
     }
@@ -226,7 +226,7 @@ fun BottomContainer( authViewModel: AuthViewModel, navHostController: NavHostCon
         }
 
         if (showDialog) {
-            LogoutDialog(onDismiss = { showDialog = false }, authViewModel = authViewModel,navHostController)
+            LogoutDialog(onDismiss = { showDialog = false }, authViewModel = authViewModel,navHostController, homeViewModel)
         }
     }
 }
@@ -275,7 +275,7 @@ fun BottomContainerDesign(
 
 
 @Composable
-fun LogoutDialog(onDismiss: () -> Unit, authViewModel: AuthViewModel, navHostController: NavHostController) {
+fun LogoutDialog(onDismiss: () -> Unit, authViewModel: AuthViewModel, navHostController: NavHostController, homeViewModel: HomeViewModel) {
     AlertDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -286,6 +286,7 @@ fun LogoutDialog(onDismiss: () -> Unit, authViewModel: AuthViewModel, navHostCon
                         popUpTo(NavRoute.BottomNavigation.route) { inclusive = true }
                     }
                 }
+                homeViewModel.setLoggedInState(false)
                 // Dismiss the dialog after logging out
                 onDismiss()
             }, colors = ButtonDefaults.buttonColors(

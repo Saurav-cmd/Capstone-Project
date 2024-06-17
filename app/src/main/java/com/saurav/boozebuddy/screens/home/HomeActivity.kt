@@ -48,10 +48,18 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
+
+    LaunchedEffect(Unit) {
+       run {
+           homeViewModel.initializeData()
+       }
+    }
+
     // Collect the brands from HomeViewModel
     val brands by homeViewModel.brands.observeAsState(emptyList())
     val isLoading by homeViewModel.isLoading.observeAsState(false)
     val banners by homeViewModel.banners.observeAsState(emptyList())
+    val isLoadingBanner by homeViewModel.isLoadingBanners.observeAsState(initial = false)
 
     LazyColumn(
         modifier = Modifier
@@ -64,7 +72,28 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
         item { Spacer(modifier = Modifier.height(10.dp)) }
 //        item { SearchField("Search your favourite brand") }
         item { Spacer(modifier = Modifier.height(20.dp)) }
-        item { Banner(banners) }
+        item {
+            if(isLoadingBanner){
+                Card(
+                    shape = RoundedCornerShape(10.dp),
+                    elevation = CardDefaults.cardElevation(1.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp) // Ensure the Card takes full width and height
+                        .padding(16.dp) // Add padding to center the CircularProgressIndicator
+                ){
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = colors.secondary)
+                    }
+                }
+            }else{
+                Banner(banners)
+            }
+
+        }
         item { Spacer(modifier = Modifier.height(20.dp)) }
         item { TopBrandsLine() }
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -136,33 +165,34 @@ fun Banner(banners: List<BannerModel>) {
                 .fillMaxWidth()
                 .height(180.dp) // Ensure the Card takes full width and height
         ) {
-            val painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(banners[page].bannerImage)
-                    .apply {
-                        crossfade(true)
-                        placeholder(ImagesConst.appLogo)
-                        error(ImagesConst.appLogo)
-                    }
-                    .build()
-            )
+                val painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(banners[page].bannerImage)
+                        .apply {
+                            crossfade(true)
+                            placeholder(ImagesConst.appLogo)
+                            error(ImagesConst.appLogo)
+                        }
+                        .build()
+                )
 
-            Image(
-                painter = painter,
-                contentDescription = "Promotion Banner Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize() // Ensure the Image takes the full size of the card
-                    .offset {
-                        val pageOffset =
-                            this@HorizontalPager.calculateCurrentOffsetForPage(page)
-                        // Use it as a multiplier to apply an offset
-                        IntOffset(
-                            x = (32.dp * pageOffset).roundToPx(),
-                            y = 0,
-                        )
-                    }
-            )
+                Image(
+                    painter = painter,
+                    contentDescription = "Promotion Banner Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize() // Ensure the Image takes the full size of the card
+                        .offset {
+                            val pageOffset =
+                                this@HorizontalPager.calculateCurrentOffsetForPage(page)
+                            // Use it as a multiplier to apply an offset
+                            IntOffset(
+                                x = (32.dp * pageOffset).roundToPx(),
+                                y = 0,
+                            )
+                        }
+                )
+
         }
     }
 }
@@ -177,7 +207,9 @@ private fun GreetingContainer(navController: NavHostController, homeViewModel: H
     val userInfo by homeViewModel.userInfo.observeAsState(initial = UserModel())
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp,),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp,),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -261,7 +293,9 @@ fun TopBrandsLine() {
     val colors = MaterialTheme.colorScheme
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp,),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp,),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -289,7 +323,9 @@ fun TopBrandsLine() {
 @Composable
 fun TopBrandsGridView(navController: NavHostController, brands: List<BrandModel>) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp,),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp,),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         brands.chunked(3).forEach { brands ->
