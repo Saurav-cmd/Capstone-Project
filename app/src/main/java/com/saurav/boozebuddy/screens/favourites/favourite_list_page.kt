@@ -20,6 +20,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +42,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -45,6 +53,8 @@ import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.UserFavouritesModel
+import com.saurav.boozebuddy.ui.theme.errorColor
+import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 
@@ -101,9 +111,10 @@ private fun FavouritesList(userFavourites: List<UserFavouritesModel>, viewModel:
 
 @Composable
 private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel: FavouritesViewModel) {
-    val context = LocalContext.current
     val isDeletingFav by favouritesViewModel.deletingFavourites.observeAsState(initial = false)
-
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -169,37 +180,75 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
                     )
                 }
             }
-          if(isDeletingFav){
-              CircularProgressIndicator(
-                  color = colors.secondary
-              )
-          }else{
-              Icon(
-                  painter = painterResource(id = R.drawable.delete),
-                  contentDescription = "Delete",
-                  tint = Color.Red,
-                  modifier = Modifier
-                      .size(24.dp)
-                      .clickable {
-                          favouritesViewModel.deleteFavourite(favourite.id) { success, errMsg ->
-                              if (success) {
-                                  Toast
-                                      .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
-                                      .show()
-                                  favouritesViewModel.fetchUserFavourites()
-                              } else {
-                                  Toast
-                                      .makeText(context, "Error cannot delete", Toast.LENGTH_SHORT)
-                                      .show()
-                              }
-                          }
-                      }
-              )
-          }
+            Icon(
+                painter = painterResource(id = R.drawable.delete),
+                contentDescription = "Delete",
+                tint = Color.Red,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        showDialog = true
+                    }
+            )
+
+            if(showDialog){
+                DeleteDialog(onDismiss = { showDialog = false }, favouritesViewModel, favourite.id)
+            }
         }
     }
 }
 
+
+@Composable
+fun DeleteDialog(onDismiss: () -> Unit, favouritesViewModel: FavouritesViewModel, favouriteId: String) {
+    val isDeleting by favouritesViewModel.deletingFavourites.observeAsState(initial = false)
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(onClick = {
+                favouritesViewModel.deleteFavourite(favouriteId) { success, errMsg ->
+                    if (success) {
+                        Toast
+                            .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
+                            .show()
+                        favouritesViewModel.fetchUserFavourites()
+                    } else {
+                        Toast
+                            .makeText(context, "Error cannot delete", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+                // Dismiss the dialog after logging out
+                onDismiss()
+            }, colors = ButtonDefaults.buttonColors(
+                containerColor = secondaryColor,
+                contentColor = primaryColor
+            ),) {
+                if(isDeleting){
+                    CircularProgressIndicator()
+                }else{
+                    Text(text = "Yes",)
+                }
+
+            }
+        },
+        dismissButton = {
+            Button(onClick = {
+                onDismiss()
+            },  colors = ButtonDefaults.buttonColors(
+                containerColor = errorColor,
+                contentColor = primaryColor
+            ),) {
+                Text(text = "No")
+            }
+        },
+        title = {
+            Text(text = "Are you sure you want to delete?", textAlign = TextAlign.Center, color = errorColor)
+        },
+    )
+}
 
 
 
