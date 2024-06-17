@@ -12,6 +12,7 @@ import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
@@ -48,7 +49,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     private fun fetchBrands() {
         try {
             _isLoading.value = true
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 _brands.value = homeImpl.fetchBrands()
             }
         }catch (e:Exception){
@@ -76,7 +77,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     fun fetchUserInfo(){
         try{
             _isFetchingUserInfo.value = true
-          viewModelScope.launch {
+          viewModelScope.launch(Dispatchers.IO) {
             _userInfo.value =  homeImpl.fetchUserInfo()
           }
         }catch (e: Exception){
@@ -91,7 +92,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     private fun fetchBanners() {
         try {
             _isFetchingBanners.value = true
-           viewModelScope.launch {
+           viewModelScope.launch(Dispatchers.IO) {
                homeImpl.fetchBanner { banners ->
                    _banners.postValue(banners ?: emptyList())
                    _isFetchingBanners.postValue(false)
