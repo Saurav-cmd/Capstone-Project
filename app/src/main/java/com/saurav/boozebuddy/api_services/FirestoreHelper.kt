@@ -3,14 +3,19 @@ package com.saurav.boozebuddy.api_services
 import android.util.Log
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.saurav.boozebuddy.models.BannerModel
 import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserFavouritesModel
 import com.saurav.boozebuddy.models.UserModel
 import kotlinx.coroutines.tasks.await
 
-class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth: FirebaseAuth) {
+class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth: FirebaseAuth, private val database: FirebaseDatabase) {
 
     suspend fun fetchBrandsWithProducts(): List<BrandModel> {
         return try {
@@ -135,6 +140,21 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             Log.e("FavouritesImpl", "Error deleting favourite: ${e.message}")
             callback(false, e.message)
         }
+    }
+
+    fun fetchBannerData(callback: (List<BannerModel>?) -> Unit) {
+        val bannerReference = database.getReference("banner")
+        bannerReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val banners = dataSnapshot.children.mapNotNull { it.getValue(BannerModel::class.java) }
+                callback(banners)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("RealtimeDatabaseHelper", "Error fetching banner data", databaseError.toException())
+                callback(null)
+            }
+        })
     }
 
 

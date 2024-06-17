@@ -1,6 +1,7 @@
 package com.saurav.boozebuddy.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saurav.boozebuddy.api_services.FirebaseHelper
 import com.saurav.boozebuddy.api_services.FirestoreHelper
@@ -30,7 +31,11 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirestoreHelper(firestore: FirebaseFirestore, auth:FirebaseAuth): FirestoreHelper = FirestoreHelper(firestore, auth)
+    fun provideRealtimeFirebaseDB(): FirebaseDatabase = FirebaseDatabase.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirestoreHelper(firestore: FirebaseFirestore, auth:FirebaseAuth, realTimeDB: FirebaseDatabase): FirestoreHelper = FirestoreHelper(firestore, auth, realTimeDB)
 
     //his method tells Hilt to create a FirebaseHelper instance by
     // passing the FirebaseAuth instance provided by provideFirebaseAuth

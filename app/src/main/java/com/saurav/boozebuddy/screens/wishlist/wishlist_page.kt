@@ -126,12 +126,12 @@ private fun WishListHeader() {
                 text = "JD",
                 style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = colors.secondary)
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Adjust spacing as needed
+            Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add",
                 tint = colors.secondary,
-                modifier = Modifier.size(16.dp) // Adjust size as needed
+                modifier = Modifier.size(16.dp)
             )
         }
         Button(
@@ -150,12 +150,12 @@ private fun WishListHeader() {
                         color = colors.secondary
                     )
                 )
-                Spacer(modifier = Modifier.width(4.dp)) // Adjust spacing as needed
+                Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add to Cart",
                     tint = colors.secondary,
-                    modifier = Modifier.size(16.dp) // Adjust size as needed
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
@@ -18,27 +17,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.google.accompanist.pager.rememberPagerState
 import com.google.gson.Gson
-import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
+import com.saurav.boozebuddy.models.BannerModel
 import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.UserModel
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.HomeViewModel
-
+import kotlin.math.absoluteValue
 
 
 @Composable
@@ -46,21 +51,21 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     // Collect the brands from HomeViewModel
     val brands by homeViewModel.brands.observeAsState(emptyList())
     val isLoading by homeViewModel.isLoading.observeAsState(false)
-
+    val banners by homeViewModel.banners.observeAsState(emptyList())
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
             .imePadding(), // Adds padding for the on-screen keyboard if needed
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
+        contentPadding = PaddingValues(vertical = 10.dp)
     ) {
         item { GreetingContainer(navController, homeViewModel) }
         item { Spacer(modifier = Modifier.height(10.dp)) }
 //        item { SearchField("Search your favourite brand") }
-        item { Spacer(modifier = Modifier.height(25.dp)) }
-        item { Banner() }
-        item { Spacer(modifier = Modifier.height(25.dp)) }
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+        item { Banner(banners) }
+        item { Spacer(modifier = Modifier.height(20.dp)) }
         item { TopBrandsLine() }
         item { Spacer(modifier = Modifier.height(16.dp)) }
         item {
@@ -92,13 +97,87 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     }
 }
 
+
+
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun Banner(banners: List<BannerModel>) {
+    val pagerState = rememberPagerState(initialPage = 1)
+
+    HorizontalPager(
+        count = banners.size,
+        state = pagerState,
+        contentPadding = PaddingValues(horizontal = 45.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) { page ->
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            elevation = CardDefaults.cardElevation(1.dp),
+            modifier = Modifier
+                .graphicsLayer {
+                    val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+
+                    lerp(
+                        start = 0.85f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    ).also { scale ->
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    alpha = lerp(
+                        start = 0.5f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    )
+                }
+                .fillMaxWidth()
+                .height(180.dp) // Ensure the Card takes full width and height
+        ) {
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(banners[page].bannerImage)
+                    .apply {
+                        crossfade(true)
+                        placeholder(ImagesConst.appLogo)
+                        error(ImagesConst.appLogo)
+                    }
+                    .build()
+            )
+
+            Image(
+                painter = painter,
+                contentDescription = "Promotion Banner Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize() // Ensure the Image takes the full size of the card
+                    .offset {
+                        val pageOffset =
+                            this@HorizontalPager.calculateCurrentOffsetForPage(page)
+                        // Use it as a multiplier to apply an offset
+                        IntOffset(
+                            x = (32.dp * pageOffset).roundToPx(),
+                            y = 0,
+                        )
+                    }
+            )
+        }
+    }
+}
+
+
+
+
+
 @Composable
 private fun GreetingContainer(navController: NavHostController, homeViewModel: HomeViewModel) {
     val isLoading by homeViewModel.isFetchingUserInfo.observeAsState(initial = false)
     val userInfo by homeViewModel.userInfo.observeAsState(initial = UserModel())
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp,),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -152,22 +231,6 @@ private fun GreetingContainer(navController: NavHostController, homeViewModel: H
     }
 }
 
-@Composable
-private fun Banner() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.banner),
-            contentDescription = "Promotion Banner Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchField(placeholderText: String) {
@@ -198,7 +261,7 @@ fun TopBrandsLine() {
     val colors = MaterialTheme.colorScheme
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp,),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -226,7 +289,7 @@ fun TopBrandsLine() {
 @Composable
 fun TopBrandsGridView(navController: NavHostController, brands: List<BrandModel>) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp,),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         brands.chunked(3).forEach { brands ->

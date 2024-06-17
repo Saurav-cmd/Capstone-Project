@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurav.boozebuddy.api_services.ErrorHandler
 import com.saurav.boozebuddy.impl.home_impl.HomeImpl
+import com.saurav.boozebuddy.models.BannerModel
 import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
@@ -32,15 +34,22 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     private val _isFetchingUserInfo = MutableLiveData<Boolean>()
     val isFetchingUserInfo: LiveData<Boolean> get() = _isFetchingUserInfo
 
+    private val _banners = MutableLiveData<List<BannerModel>>()
+    val banners: LiveData<List<BannerModel>> get() = _banners
+
+    private val _isFetchingBanners = MutableLiveData<Boolean>()
+    val isFetchingBanners: LiveData<Boolean> get() = _isFetchingBanners
+
     init {
         fetchBrands()
+        fetchBanners()
     }
 
     //function to fetch the brands
     private fun fetchBrands() {
         try {
             _isLoading.value = true
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 _brands.value = homeImpl.fetchBrands()
             }
         }catch (e:Exception){
@@ -68,7 +77,7 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
     fun fetchUserInfo(){
         try{
             _isFetchingUserInfo.value = true
-          viewModelScope.launch {
+          viewModelScope.launch(Dispatchers.IO) {
             _userInfo.value =  homeImpl.fetchUserInfo()
           }
         }catch (e: Exception){
@@ -78,6 +87,24 @@ class HomeViewModel @Inject constructor(private val homeImpl: HomeImpl) : ViewMo
             _isFetchingUserInfo.value = false
         }
     }
+
+    // Function to fetch banners
+    private fun fetchBanners() {
+        try {
+            _isFetchingBanners.value = true
+           viewModelScope.launch(Dispatchers.IO) {
+               homeImpl.fetchBanner { banners ->
+                   _banners.postValue(banners ?: emptyList())
+                   _isFetchingBanners.postValue(false)
+               }
+           }
+        } catch (e: Exception) {
+            _isFetchingBanners.value = false
+            ErrorHandler.getErrorMessage(e)
+        }
+    }
+
+
 
     fun clearFilteredProducts() {
         _filteredProduct.value = emptyList()

@@ -1,8 +1,8 @@
 package com.saurav.boozebuddy.impl.home_impl
 
 import com.saurav.boozebuddy.api_services.FirestoreHelper
-
 import com.saurav.boozebuddy.app_interface.home_interface.HomeInterface
+import com.saurav.boozebuddy.models.BannerModel
 import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.UserModel
 import javax.inject.Inject
@@ -17,4 +17,7 @@ class HomeImpl @Inject constructor(private val firestoreHelper: FirestoreHelper)
         return firestoreHelper.fetchUserInfo()
     }
 
+    override suspend fun fetchBanner(callback: (List<BannerModel>?) -> Unit){
+        return firestoreHelper.fetchBannerData(callback)
+    }
 }
