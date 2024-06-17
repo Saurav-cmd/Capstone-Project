@@ -102,6 +102,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.20.0")
 
+    implementation("com.google.firebase:firebase-database:21.0.0")
+
+    //for caruosel slider of the banner
+    implementation("com.google.accompanist:accompanist-pager:0.24.10-beta")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.24.10-beta")
+
+
 
 }
 
