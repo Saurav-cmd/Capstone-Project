@@ -22,6 +22,7 @@ import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.screens.notification.NotificationPage
 import com.saurav.boozebuddy.screens.profile.ProfilePage
+import com.saurav.boozebuddy.screens.wishlist.CartPage
 import com.saurav.boozebuddy.screens.wishlist.WishListPage
 import com.saurav.boozebuddy.ui.theme.bottomNavUnSelectedIconColor
 import com.saurav.boozebuddy.view_models.AuthViewModel
@@ -78,6 +79,9 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
                     NotificationPage()
                 }
                 2 -> {
+                    CartPage()
+                }
+                3 -> {
                     WishListPage()
                 }
                 else -> {
@@ -92,5 +96,6 @@ enum class NavigationBarItems(val icon: ImageVector) {
     Home(icon = Icons.Default.Home),
     Notification(icon = Icons.Default.Notifications),
     Cart(icon = Icons.Default.ShoppingCart),
+    Wish(icon = Icons.Default.FavoriteBorder),
     Person(icon = Icons.Default.Person),
 }
