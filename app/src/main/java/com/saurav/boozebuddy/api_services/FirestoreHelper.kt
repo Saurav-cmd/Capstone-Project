@@ -157,6 +157,43 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         })
     }
 
+    suspend fun storeUserWishlist(
+        folderName: String,
+        productName: String,
+        productDesc: String,
+        productImage: String,
+        brandName: String,
+        productId: String,
+        brandId: String,
+        callback: (Boolean, String?) -> Unit
+    ) {
+        try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            val productData = hashMapOf(
+                "productId" to productId.trim(),
+                "productName" to productName,
+                "productDescription" to productDesc,
+                "brandName" to brandName,
+                "productImage" to productImage,
+                "brandId" to brandId.trim()
+            )
+
+            firestore.collection("users")
+                .document(uid)
+                .collection("wishlist")
+                .document(folderName)
+                .collection("products")
+                .add(productData)
+                .await()
+
+            callback(true, "Favourite added successfully")
+        } catch (e: Exception) {
+            callback(false, "$e")
+            ErrorHandler.getErrorMessage(e)
+        }
+    }
 
 
 }

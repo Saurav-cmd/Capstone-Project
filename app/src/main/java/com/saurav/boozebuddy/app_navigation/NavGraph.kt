@@ -23,6 +23,7 @@ import com.saurav.boozebuddy.screens.product.ProductsDetailPage
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
+import com.saurav.boozebuddy.view_models.WishlistViewModel
 
 object NavGraph {
     @Composable
@@ -30,14 +31,14 @@ object NavGraph {
         navController: NavHostController,
         authViewModel: AuthViewModel,
         homeViewModel: HomeViewModel,
-        favouritesViewModel: FavouritesViewModel
+        favouritesViewModel: FavouritesViewModel,
+        wishlistViewModel: WishlistViewModel
     ) {
         NavHost(navController = navController, startDestination = NavRoute.Splash.route) {
             composable(NavRoute.Splash.route) { SplashScreen(navController, authViewModel) }
             composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
             composable(NavRoute.SignUp.route) { SignupPage(navController, authViewModel) }
             composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
-//            composable(NavRoute.ProductDetail.route) { ProductsDetailPage() }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController, favouritesViewModel) }
             composable(NavRoute.ProductListing.route + "/{products}/{brandName}/{brandId}") { backStackEntry ->
                 val productsJson = backStackEntry.arguments?.getString("products")
@@ -62,7 +63,7 @@ object NavGraph {
                 val brandId: String = Gson().fromJson(brandIdJson, String::class.java)
 
                 Log.e("When passing the data: ", "$brandId ${productData.productId}")
-                ProductsDetailPage(navController, favouritesViewModel, productData, brandName, brandId)
+                ProductsDetailPage(navController, favouritesViewModel, productData, brandName, brandId, wishlistViewModel)
             }
 
         }

@@ -1,9 +1,11 @@
 package com.saurav.boozebuddy.screens.product
 
 import android.util.Log
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,18 +23,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,9 +52,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -51,10 +65,12 @@ import coil.size.Size
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
+import com.saurav.boozebuddy.ui.theme.errorColor
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
+import com.saurav.boozebuddy.view_models.WishlistViewModel
 
 @Composable
 fun ProductsDetailPage(
@@ -62,7 +78,8 @@ fun ProductsDetailPage(
     favouritesViewModel: FavouritesViewModel,
     productInfo: Product,
     brandName: String?,
-    brandId: String?
+    brandId: String?,
+    wishlistViewModel: WishlistViewModel
 ) {
     LazyColumn(
         modifier = Modifier
@@ -80,7 +97,10 @@ fun ProductsDetailPage(
                 productInfo.productImage ?: "",
                 productInfo.productId,
                 brandName,
-                brandId
+                brandId,
+                navHostController,
+                wishlistViewModel,
+                productInfo
             )
         }
     }
@@ -141,7 +161,10 @@ fun ProductDetailsSection(
     productImage: String,
     productId: String?,
     brandName: String?,
-    brandId: String?
+    brandId: String?,
+    navHostController: NavHostController,
+    wishlistViewModel: WishlistViewModel,
+    productInfo: Product,
 ) {
     Box(
         modifier = Modifier
@@ -167,7 +190,7 @@ fun ProductDetailsSection(
             Spacer(modifier = Modifier.height(25.dp))
 //            PriceAndQuantity()
             Spacer(modifier = Modifier.weight(1f)) // Fill remaining space
-            AddCartButton()
+            AddCartButton(navHostController, wishlistViewModel, productInfo, brandName, brandId)
         }
     }
 }
@@ -206,40 +229,40 @@ private fun Details(
                     contentColor = Color.Red
                 ),
                 onClick = {
-                  if(favouritesViewModel.checkIfAlreadyFavourite(productId?:"")){
-                      Toast.makeText(context, "Already in Favourites List", Toast.LENGTH_SHORT).show()
-                  }else{
-                      favouritesViewModel.storeIsFavourites(
-                          productName ?: "",
-                          brandName ?: "",
-                          productImage,
-                          productId ?: "",
-                          brandId ?: ""
-                      ) { success, errMsg ->
-                          if (success) {
-                              Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                              favouritesViewModel.checkIfAlreadyFavourite(productId ?: "")
-                          } else {
-                              //error
-                              Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
-                          }
-                      }
-                  }
+                    if (favouritesViewModel.checkIfAlreadyFavourite(productId ?: "")) {
+                        Toast.makeText(context, "Already in Favourites List", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        favouritesViewModel.storeIsFavourites(
+                            productName ?: "",
+                            brandName ?: "",
+                            productImage,
+                            productId ?: "",
+                            brandId ?: ""
+                        ) { success, errMsg ->
+                            if (success) {
+                                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                                favouritesViewModel.checkIfAlreadyFavourite(productId ?: "")
+                            } else {
+                                //error
+                                Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
 
                 }
             ) {
-                if(favouritesViewModel.checkIfAlreadyFavourite(productId?:"")){
+                if (favouritesViewModel.checkIfAlreadyFavourite(productId ?: "")) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Favourites"
                     )
-                }else{
+                } else {
                     if (isAddingToFavourite) CircularProgressIndicator() else Icon(
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = "Favourites"
                     )
                 }
-
 
 
             }
@@ -328,7 +351,15 @@ private fun QuantityBoxDesign(value: String) {
 }
 
 @Composable
-fun AddCartButton() {
+fun AddCartButton(
+    navHostController: NavHostController,
+    wishlistViewModel: WishlistViewModel,
+    productInfo: Product,
+    brandName: String?,
+    brandId: String?,
+) {
+    var isDialogueOpen by remember { mutableStateOf<Boolean>(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -337,7 +368,7 @@ fun AddCartButton() {
     ) {
         Button(
             onClick = {
-                // Handle button click
+                isDialogueOpen = true
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = secondaryColor,
@@ -350,6 +381,170 @@ fun AddCartButton() {
             Text(
                 text = "Add to Wishlist",
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+            )
+        }
+    }
+
+    if (isDialogueOpen) {
+        WishListDialog(
+            onDismiss = { isDialogueOpen = false },
+            navHostController = navHostController,
+            wishlistViewModel = wishlistViewModel,
+            productInfo,
+            brandName, brandId
+        )
+    }
+}
+
+
+@Composable
+fun WishListDialog(
+    onDismiss: () -> Unit,
+    navHostController: NavHostController,
+    wishlistViewModel: WishlistViewModel,
+    productInfo: Product,
+    brandName: String?,
+    brandId: String?,
+) {
+
+    val isStoringWishlist by wishlistViewModel.isStoringWishList.observeAsState(initial = false)
+    var wishlistName by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                onClick = {
+                    wishlistViewModel.storeWishList(
+                        wishlistName,
+                        productInfo.productName ?: "",
+                        productInfo.productDescription ?: "",
+                        productInfo.productImage ?: "",
+                        brandName ?: "",
+                        productInfo.productId,
+                        brandId ?: ""
+                    ){
+                        success, errMsg ->
+
+                        if(success){
+                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = secondaryColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                if (isStoringWishlist) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = "Yes")
+                }
+
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = errorColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                Text(text = "No")
+            }
+        },
+        title = {
+            Text(
+                text = "Enter your wishlist name",
+                textAlign = TextAlign.Center,
+                color = colors.secondary,
+                fontSize = 16.sp
+            )
+        },
+
+        text = {
+            "Wishlist".TextFormField(
+                value = wishlistName,
+                onValueChange = { wishlistName = it },
+                validator = { input ->
+                    when {
+                        input.isEmpty() -> "Field cannot be empty"
+                        else -> null
+                    }
+                }
+            )
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun String.TextFormField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    showSuffix: Boolean = false,
+    validator: (String) -> String?
+) {
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var passwordVisible by remember { mutableStateOf(false) } // State variable for password visibility
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+                errorMessage = validator(it)
+            },
+            placeholder = { Text(text = this@TextFormField, color = secondaryColor) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 0.dp)
+                .border(width = 1.dp, color = secondaryColor, shape = RoundedCornerShape(10.dp)),
+            visualTransformation = if (showSuffix) {
+                if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
+            } else {
+                VisualTransformation.None
+            },
+
+            // Use VisualTransformation.None when passwordVisible is true to show the password
+            shape = RoundedCornerShape(10.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                containerColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                cursorColor = Color.Black
+            ),
+            trailingIcon = {
+                if (showSuffix) {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Filled.Build else Icons.Filled.Lock,
+                            // Use Icons.Filled.Eye when passwordVisible is false to show the eye icon
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        )
+                    }
+                } else {
+                    null
+                }
+
+            }
+        )
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                modifier = Modifier.padding(start = 20.dp, top = 4.dp)
             )
         }
     }

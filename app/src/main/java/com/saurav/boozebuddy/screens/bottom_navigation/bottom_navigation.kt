@@ -78,10 +78,10 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
                 1 -> {
                     NotificationPage()
                 }
+//                2 -> {
+//                    CartPage()
+//                }
                 2 -> {
-                    CartPage()
-                }
-                3 -> {
                     WishListPage()
                 }
                 else -> {
@@ -95,7 +95,7 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
 enum class NavigationBarItems(val icon: ImageVector) {
     Home(icon = Icons.Default.Home),
     Notification(icon = Icons.Default.Notifications),
-    Cart(icon = Icons.Default.ShoppingCart),
+//    Cart(icon = Icons.Default.ShoppingCart),
     Wish(icon = Icons.Default.FavoriteBorder),
     Person(icon = Icons.Default.Person),
 }

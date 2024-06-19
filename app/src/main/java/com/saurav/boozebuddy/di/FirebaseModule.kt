@@ -23,8 +23,6 @@ object FirebaseModule {
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
-
-
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -35,11 +33,16 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirestoreHelper(firestore: FirebaseFirestore, auth:FirebaseAuth, realTimeDB: FirebaseDatabase): FirestoreHelper = FirestoreHelper(firestore, auth, realTimeDB)
+    fun provideFirestoreHelper(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
+        realTimeDB: FirebaseDatabase
+    ): FirestoreHelper = FirestoreHelper(firestore, auth, realTimeDB)
 
     //his method tells Hilt to create a FirebaseHelper instance by
     // passing the FirebaseAuth instance provided by provideFirebaseAuth
     @Provides
     @Singleton
-    fun provideFirebaseHelper(auth: FirebaseAuth, firestore: FirebaseFirestore): FirebaseHelper = FirebaseHelper(auth, firestore)
+    fun provideFirebaseHelper(auth: FirebaseAuth, firestore: FirebaseFirestore): FirebaseHelper =
+        FirebaseHelper(auth, firestore)
 }
