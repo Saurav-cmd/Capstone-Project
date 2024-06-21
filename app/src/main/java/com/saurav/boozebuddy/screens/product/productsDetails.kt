@@ -517,13 +517,14 @@ private fun String.TextFormField(
 
             // Use VisualTransformation.None when passwordVisible is true to show the password
             shape = RoundedCornerShape(10.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color.Black,
-                containerColor = Color.White,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                disabledContainerColor = Color.White,
+                cursorColor = Color.Black,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
-                cursorColor = Color.Black
             ),
             trailingIcon = {
                 if (showSuffix) {

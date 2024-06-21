@@ -130,13 +130,14 @@ private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) 
             .padding(start = 20.dp,top = 10.dp, end = 20.dp)
             .border(1.dp, colors.secondary, RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color.Black,
-            containerColor = Color.White,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            disabledContainerColor = Color.White,
+            cursorColor = Color.Black,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            cursorColor = Color.Black
         )
     )
     Spacer(modifier = Modifier.height(25.dp))

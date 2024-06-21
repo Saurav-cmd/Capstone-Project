@@ -263,7 +263,6 @@ private fun GreetingContainer(navController: NavHostController, homeViewModel: H
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchField(placeholderText: String) {
     var textFieldValue by remember { mutableStateOf("") }
@@ -278,9 +277,7 @@ private fun SearchField(placeholderText: String) {
             .padding(top = 10.dp)
             .border(width = 1.dp, color = colors.secondary, shape = RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = colors.secondary,
-            containerColor = Color.White,
+        colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
@@ -359,8 +356,6 @@ fun TopBrandsGridView(navController: NavHostController, brands: List<BrandModel>
         }
 
     }
-
-
 }
 
 
