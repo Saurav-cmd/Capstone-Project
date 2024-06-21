@@ -22,6 +22,10 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
     private val _wishListValue = MutableLiveData<List<WishlistModel>>()
     val wishListValue: LiveData<List<WishlistModel>> get() = _wishListValue
 
+    init {
+        fetchWishlist()
+    }
+
     fun storeWishList(
         folderName: String,
         productName: String,
@@ -35,25 +39,30 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
         try {
             _isStoringWishlist.value = true
             viewModelScope.launch {
-                wishlistImplementation.addWishList(
-                    folderName,
-                    productName,
-                    productDesc,
-                    productImage,
-                    brandName,
-                    productId,
-                    brandId
-                ) { success, errMsg ->
-                    callback(success, errMsg)
+                if (folderName.isNotEmpty()) {
+                    wishlistImplementation.addWishList(
+                        folderName,
+                        productName,
+                        productDesc,
+                        productImage,
+                        brandName,
+                        productId,
+                        brandId
+                    ) { success, errMsg ->
+                        callback(success, errMsg)
+                    }
+                } else {
+                    callback(false, "Wishlist name cannot be empty")
                 }
             }
         } catch (e: Exception) {
             _isStoringWishlist.value = false
             ErrorHandler.getErrorMessage(e)
-        }finally {
+        } finally {
             _isStoringWishlist.value = false
         }
     }
+
 
     fun fetchWishlist() {
         _isFetchingWishList.value = true

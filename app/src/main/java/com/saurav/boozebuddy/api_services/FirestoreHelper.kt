@@ -173,14 +173,28 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
             val uid = currentUser.uid
 
-            // Add a new document to the 'wishlist' collection with auto-generated ID
-            val wishlistItemId = firestore.collection("users")
+            // Check if the user has selected an existing wishlist or provided a new one
+            val existingWishlistQuery = firestore.collection("users")
                 .document(uid)
                 .collection("wishlist")
-                .add(mapOf("folderName" to folderName)) // Store folderName directly under wishlist item
+                .whereEqualTo("folderName", folderName)
+                .get()
                 .await()
-                .id
 
+            val wishlistItemId = if (existingWishlistQuery.isEmpty) {
+                // Create a new document under 'wishlist' collection with auto-generated ID
+                firestore.collection("users")
+                    .document(uid)
+                    .collection("wishlist")
+                    .add(mapOf("folderName" to folderName))
+                    .await()
+                    .id
+            } else {
+                // Use the existing document ID if the wishlist already exists
+                existingWishlistQuery.documents.first().id
+            }
+
+            // Prepare product data to store under the selected wishlist
             val productData = hashMapOf(
                 "productId" to productId.trim(),
                 "productName" to productName,

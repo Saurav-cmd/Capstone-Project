@@ -66,7 +66,7 @@ fun WishListPage(wishlistViewModel: WishlistViewModel) {
     ) {
         Spacer(modifier = Modifier.height(10.dp))
         TopContainer()
-        if(isFetchingWishList){
+        if (isFetchingWishList) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,15 +80,14 @@ fun WishListPage(wishlistViewModel: WishlistViewModel) {
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(text = "Loading Wishlist...", color = secondaryColor, fontSize = 18.sp)
             }
-        }else if(wishListData.isEmpty()){
-           Box(
-               modifier= Modifier.fillMaxSize(),
-               contentAlignment = Alignment.Center
-           ) {
-               Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
-           }
-        }
-        else{
+        } else if (wishListData.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
+            }
+        } else {
             DetailContainer(wishListData)
         }
 
@@ -118,20 +117,28 @@ private fun TopContainer() {
 @Composable
 private fun DetailContainer(wishListData: List<WishlistModel>) {
     LazyColumn(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 5.dp)
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 5.dp, top = 10.dp)
     ) {
         items(wishListData.size) { index ->
             val data = wishListData[index]
-           Row(
-               modifier = Modifier.fillMaxWidth(),
-               horizontalArrangement = Arrangement.SpaceBetween,
-               verticalAlignment = Alignment.CenterVertically
-           ) {
-               Text(data.wishName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }, color=colors.secondary)
-               IconButton(onClick = { /*TODO*/ },) {
-                   Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
-               }
-           }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    data.wishName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
+                    color = colors.secondary,
+                    fontSize = 18.sp
+                )
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.Red
+                    )
+                }
+            }
             Divider()
         }
     }

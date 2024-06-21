@@ -30,6 +30,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -69,6 +70,7 @@ import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
+import java.util.Locale
 
 @Composable
 fun ProductsDetailPage(
@@ -405,9 +407,15 @@ fun WishListDialog(
     brandId: String?,
 ) {
 
+    // State variables
     val isStoringWishlist by wishlistViewModel.isStoringWishList.observeAsState(initial = false)
     var wishlistName by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val wishListData by wishlistViewModel.wishListValue.observeAsState(initial = emptyList())
+    val isFetchingWishList by wishlistViewModel.isFetchingWishList.observeAsState(initial = false)
+
+    // State variable to track selected wishlist item
+    var selectedWishlistIndex by remember { mutableStateOf(-1) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -415,21 +423,42 @@ fun WishListDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    wishlistViewModel.storeWishList(
-                        wishlistName,
-                        productInfo.productName ?: "",
-                        productInfo.productDescription ?: "",
-                        productInfo.productImage ?: "",
-                        brandName ?: "",
-                        productInfo.productId,
-                        brandId ?: ""
-                    ){
-                        success, errMsg ->
-
-                        if(success){
-                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                        }else{
-                            Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                    if (selectedWishlistIndex != -1) {
+                        // User selected an existing wishlist
+                        val selectedWishlist = wishListData[selectedWishlistIndex]
+                        wishlistViewModel.storeWishList(
+                            selectedWishlist.wishName,
+                            productInfo.productName ?: "",
+                            productInfo.productDescription ?: "",
+                            productInfo.productImage ?: "",
+                            brandName ?: "",
+                            productInfo.productId,
+                            brandId ?: ""
+                        ) { success, errMsg ->
+                            if (success) {
+                                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                                wishlistViewModel.fetchWishlist()
+                            } else {
+                                Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        // User wants to create a new wishlist
+                        wishlistViewModel.storeWishList(
+                            wishlistName,
+                            productInfo.productName ?: "",
+                            productInfo.productDescription ?: "",
+                            productInfo.productImage ?: "",
+                            brandName ?: "",
+                            productInfo.productId,
+                            brandId ?: ""
+                        ) { success, errMsg ->
+                            if (success) {
+                                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                                wishlistViewModel.fetchWishlist()
+                            } else {
+                                Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                     onDismiss()
@@ -444,7 +473,6 @@ fun WishListDialog(
                 } else {
                     Text(text = "Yes")
                 }
-
             }
         },
         dismissButton = {
@@ -490,7 +518,6 @@ fun WishListDialog(
                 )
             }
         },
-
         text = {
             Column {
                 Text(
@@ -499,26 +526,59 @@ fun WishListDialog(
                     color = colors.secondary,
                     fontSize = 16.sp
                 )
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                ) {
-                    items(15) { index ->
-                        Text(
-                            text = "Hello $index",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            textAlign = TextAlign.Start
+                if (isFetchingWishList) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(50.dp),
+                            color = secondaryColor,
+                            strokeWidth = 2.dp
                         )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Text(text = "Loading Wishlist...", color = secondaryColor, fontSize = 18.sp)
+                    }
+                } else if (wishListData.isEmpty()) {
+                    // Handle case when wishlist data is empty
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(if (wishListData.size > 5) 200.dp else 100.dp)
+                    ) {
+                        items(wishListData.size) { index ->
+                            val data = wishListData[index]
+                            val isSelected = index == selectedWishlistIndex
+
+                            // Clickable Text item
+                            Text(
+                                data.wishName.replaceFirstChar {
+                                    if (it.isLowerCase()) it.titlecase(
+                                        Locale.ROOT
+                                    ) else it.toString()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                                    .clickable {
+                                        selectedWishlistIndex = index // Update selected index
+                                    }
+                                    .background(if (isSelected) Color.LightGray else Color.Transparent),
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Start
+                            )
+                            Divider()
+                        }
                     }
                 }
             }
         }
-
     )
 }
+
+
 
 @Composable
 private fun String.TextFormField(
