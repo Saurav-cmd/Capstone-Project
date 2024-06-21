@@ -234,6 +234,7 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                 .await()
 
             val wishListData = wishListSnapshot.documents.mapNotNull { document ->
+                val wishId = document.id // Get the wishlist item ID
                 val wishName = document.getString("folderName") ?: return@mapNotNull null
 
                 val productsSnapshot = document.reference.collection(wishName).get().await()
@@ -241,12 +242,8 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                     productDoc.toObject(WishListProducts::class.java)
                 }
 
-                WishlistModel(wishName, products).also {
-                    Log.d("WishlistItem", it.toString())
-                }
+                WishlistModel(wishId, wishName, products)
             }
-
-            Log.d("Wishlist Data", wishListData.toString())
             wishListData
         } catch (e: Exception) {
             Log.e("Fetch Wishlist", "Error fetching user wishlist: ${e.message}", e)
@@ -255,6 +252,29 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
     }
 
 
+    suspend fun deleteWishList(wishListId: String, callback: (Boolean, String?) -> Unit) {
+        try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
 
+            // Get a reference to the user's document
+            val userRef = firestore.collection("users").document(uid)
 
+            // Get a reference to the wishlist document to be deleted
+            val wishListDocRef = userRef.collection("wishlist").document(wishListId)
+
+            // Check if the document exists
+            val documentSnapshot = wishListDocRef.get().await()
+            if (documentSnapshot.exists()) {
+                // Delete the document
+                wishListDocRef.delete().await()
+                callback(true, null)
+            } else {
+                callback(false, "Document not found")
+            }
+        } catch (e: Exception) {
+            Log.e("WishList Impl", "Error deleting wishlist: ${e.message}")
+            callback(false, e.message)
+        }
+    }
 }

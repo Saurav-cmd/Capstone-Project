@@ -15,5 +15,6 @@ interface WishlistInterface {
     )
 
     suspend fun getWishList():List<WishlistModel>
+    suspend fun deleteWishList(wishListId:String, callback: (Boolean, String?) -> Unit)
 
 }

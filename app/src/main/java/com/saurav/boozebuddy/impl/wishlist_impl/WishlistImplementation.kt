@@ -25,4 +25,10 @@ class WishlistImplementation @Inject constructor(val firestoreHelper: FirestoreH
     override suspend fun getWishList(): List<WishlistModel> {
         return firestoreHelper.fetchWishList()
     }
+
+    override suspend fun deleteWishList(wishListId: String, callback: (Boolean, String?) -> Unit) {
+        firestoreHelper.deleteWishList(wishListId){success, errMsg ->
+            callback(success, errMsg)
+        }
+    }
 }

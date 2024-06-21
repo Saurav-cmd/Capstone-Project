@@ -8,10 +8,8 @@ import SignupPage
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.saurav.boozebuddy.models.Product
@@ -20,6 +18,7 @@ import com.saurav.boozebuddy.screens.auth.LoginPage
 import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
 import com.saurav.boozebuddy.screens.product.ProductListingScreen
 import com.saurav.boozebuddy.screens.product.ProductsDetailPage
+import com.saurav.boozebuddy.screens.wishlist.WishlistProductListingPage
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
@@ -65,6 +64,7 @@ object NavGraph {
                 Log.e("When passing the data: ", "$brandId ${productData.productId}")
                 ProductsDetailPage(navController, favouritesViewModel, productData, brandName, brandId, wishlistViewModel)
             }
+            composable(NavRoute.WishListProductListingPage.route) { WishlistProductListingPage(navController) }
 
         }
     }

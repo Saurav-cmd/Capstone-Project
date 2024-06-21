@@ -1,8 +1,6 @@
 package com.saurav.boozebuddy.app_navigation
 
 
-import android.net.Uri
-
 sealed class NavRoute(val route: String) {
     object Splash : NavRoute("splash")
     object Login : NavRoute("login")
@@ -12,4 +10,5 @@ sealed class NavRoute(val route: String) {
     object ProductListing : NavRoute("product_listing")
     object ProductDetail : NavRoute("product_detail")
     object FavouritesListing : NavRoute("favourites_listing")
+    object WishListProductListingPage : NavRoute("wish_list_product_listing")
 }
