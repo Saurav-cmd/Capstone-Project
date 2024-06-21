@@ -1,7 +1,6 @@
 package com.saurav.boozebuddy.screens.product
 
 import android.util.Log
-import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +30,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -463,30 +461,65 @@ fun WishListDialog(
             }
         },
         title = {
-            Text(
-                text = "Enter your wishlist name",
-                textAlign = TextAlign.Center,
-                color = colors.secondary,
-                fontSize = 16.sp
-            )
+            Column {
+                Text(
+                    text = "Enter your wishlist name",
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W500
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                "Wishlist".TextFormField(
+                    value = wishlistName,
+                    onValueChange = { wishlistName = it },
+                    validator = { input ->
+                        when {
+                            input.isEmpty() -> "Field cannot be empty"
+                            else -> null
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    text = "Or",
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W500
+                )
+            }
         },
 
         text = {
-            "Wishlist".TextFormField(
-                value = wishlistName,
-                onValueChange = { wishlistName = it },
-                validator = { input ->
-                    when {
-                        input.isEmpty() -> "Field cannot be empty"
-                        else -> null
+            Column {
+                Text(
+                    text = "Select From Previous Wishlist",
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    fontSize = 16.sp
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                ) {
+                    items(15) { index ->
+                        Text(
+                            text = "Hello $index",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            textAlign = TextAlign.Start
+                        )
                     }
                 }
-            )
+            }
         }
+
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun String.TextFormField(
     value: String,

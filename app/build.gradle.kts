@@ -108,6 +108,12 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.24.10-beta")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.24.10-beta")
 
+    //Modal Bottomsheet
+//    implementation("androidx.compose.material:material:1.4.0")
+//    implementation("androidx.compose.ui:ui:1.4.0")
+
+
+
 
 
 }
