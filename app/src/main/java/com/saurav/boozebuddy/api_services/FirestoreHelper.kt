@@ -262,15 +262,19 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
 
             // Get a reference to the wishlist document to be deleted
             val wishListDocRef = userRef.collection("wishlist").document(wishListId)
-            // Delete the favorite document
-            wishListDocRef.delete().await()
-            callback(true, null)
+
+            // Check if the document exists
+            val documentSnapshot = wishListDocRef.get().await()
+            if (documentSnapshot.exists()) {
+                // Delete the document
+                wishListDocRef.delete().await()
+                callback(true, null)
+            } else {
+                callback(false, "Document not found")
+            }
         } catch (e: Exception) {
             Log.e("WishList Impl", "Error deleting wishlist: ${e.message}")
             callback(false, e.message)
         }
     }
-
-
-
 }
