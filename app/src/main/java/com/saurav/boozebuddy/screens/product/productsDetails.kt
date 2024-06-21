@@ -461,26 +461,62 @@ fun WishListDialog(
             }
         },
         title = {
-            Text(
-                text = "Enter your wishlist name",
-                textAlign = TextAlign.Center,
-                color = colors.secondary,
-                fontSize = 16.sp
-            )
+            Column {
+                Text(
+                    text = "Enter your wishlist name",
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W500
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                "Wishlist".TextFormField(
+                    value = wishlistName,
+                    onValueChange = { wishlistName = it },
+                    validator = { input ->
+                        when {
+                            input.isEmpty() -> "Field cannot be empty"
+                            else -> null
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    text = "Or",
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W500
+                )
+            }
         },
 
         text = {
-            "Wishlist".TextFormField(
-                value = wishlistName,
-                onValueChange = { wishlistName = it },
-                validator = { input ->
-                    when {
-                        input.isEmpty() -> "Field cannot be empty"
-                        else -> null
+            Column {
+                Text(
+                    text = "Select From Previous Wishlist",
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    fontSize = 16.sp
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                ) {
+                    items(15) { index ->
+                        Text(
+                            text = "Hello $index",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            textAlign = TextAlign.Start
+                        )
                     }
                 }
-            )
+            }
         }
+
     )
 }
 
