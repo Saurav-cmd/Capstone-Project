@@ -18,13 +18,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,7 +65,7 @@ import com.saurav.boozebuddy.view_models.FavouritesViewModel
 fun FavouritesListPage(navController: NavHostController, favouritesViewModel: FavouritesViewModel) {
 
     LaunchedEffect(Unit) {
-      favouritesViewModel.fetchUserFavourites()
+        favouritesViewModel.fetchUserFavourites()
     }
 
 
@@ -99,7 +102,10 @@ fun FavouritesListPage(navController: NavHostController, favouritesViewModel: Fa
 
 
 @Composable
-private fun FavouritesList(userFavourites: List<UserFavouritesModel>, viewModel: FavouritesViewModel) {
+private fun FavouritesList(
+    userFavourites: List<UserFavouritesModel>,
+    viewModel: FavouritesViewModel
+) {
     LazyColumn(content = {
         items(count = userFavourites.size) { index ->
             FavouritesDesign(userFavourites[index], viewModel)
@@ -109,9 +115,16 @@ private fun FavouritesList(userFavourites: List<UserFavouritesModel>, viewModel:
 }
 
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel: FavouritesViewModel) {
-    val isDeletingFav by favouritesViewModel.deletingFavourites.observeAsState(initial = false)
+private fun FavouritesDesign(
+    favourite: UserFavouritesModel,
+    favouritesViewModel: FavouritesViewModel
+) {
+    val sheetState = androidx.compose.material3.rememberModalBottomSheetState()
+    var showModalBottomSheet by remember {
+        mutableStateOf(false)
+    }
     var showDialog by remember {
         mutableStateOf(false)
     }
@@ -119,6 +132,9 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
+            .clickable {
+                showModalBottomSheet = true
+            }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -175,7 +191,7 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
                         style = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal,
-                            color = Color.Gray
+                            color = colors.secondary
                         )
                     )
                 }
@@ -191,8 +207,62 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
                     }
             )
 
-            if(showDialog){
+            if (showDialog) {
                 DeleteDialog(onDismiss = { showDialog = false }, favouritesViewModel, favourite.id)
+            }
+        }
+    }
+
+    if (showModalBottomSheet) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = { showModalBottomSheet = false}) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp).clip(shape = RoundedCornerShape(2.dp))
+                ) {
+                    val painter =
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = favourite.productImage)
+                                .apply {
+                                    crossfade(true)
+                                    placeholder(ImagesConst.appLogo)
+                                    error(ImagesConst.appLogo)
+                                }
+                                .build()
+                        )
+
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Text(
+                    text = favourite.productName,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = secondaryColor
+                    ),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = favourite.brandName.removePrefix("\"").removeSuffix("\""),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = colors.secondary
+                    )
+                )
             }
         }
     }
@@ -200,58 +270,69 @@ private fun FavouritesDesign(favourite: UserFavouritesModel, favouritesViewModel
 
 
 @Composable
-fun DeleteDialog(onDismiss: () -> Unit, favouritesViewModel: FavouritesViewModel, favouriteId: String) {
+fun DeleteDialog(
+    onDismiss: () -> Unit,
+    favouritesViewModel: FavouritesViewModel,
+    favouriteId: String
+) {
     val isDeleting by favouritesViewModel.deletingFavourites.observeAsState(initial = false)
     val context = LocalContext.current
     AlertDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
         confirmButton = {
-            Button(onClick = {
-                favouritesViewModel.deleteFavourite(favouriteId) { success, errMsg ->
-                    if (success) {
-                        Toast
-                            .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
-                            .show()
-                        favouritesViewModel.fetchUserFavourites()
-                    } else {
-                        Toast
-                            .makeText(context, "Error cannot delete", Toast.LENGTH_SHORT)
-                            .show()
+            Button(
+                onClick = {
+                    favouritesViewModel.deleteFavourite(favouriteId) { success, errMsg ->
+                        if (success) {
+                            Toast
+                                .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
+                                .show()
+                            favouritesViewModel.fetchUserFavourites()
+                        } else {
+                            Toast
+                                .makeText(context, "Error cannot delete", Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
-                }
-                // Dismiss the dialog after logging out
-                onDismiss()
-            }, colors = ButtonDefaults.buttonColors(
-                containerColor = secondaryColor,
-                contentColor = primaryColor
-            ),) {
-                if(isDeleting){
+                    // Dismiss the dialog after logging out
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = secondaryColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                if (isDeleting) {
                     CircularProgressIndicator()
-                }else{
-                    Text(text = "Yes",)
+                } else {
+                    Text(text = "Yes")
                 }
 
             }
         },
         dismissButton = {
-            Button(onClick = {
-                onDismiss()
-            },  colors = ButtonDefaults.buttonColors(
-                containerColor = errorColor,
-                contentColor = primaryColor
-            ),) {
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = errorColor,
+                    contentColor = primaryColor
+                ),
+            ) {
                 Text(text = "No")
             }
         },
         title = {
-            Text(text = "Are you sure you want to delete?", textAlign = TextAlign.Center, color = errorColor)
+            Text(
+                text = "Are you sure you want to delete?",
+                textAlign = TextAlign.Center,
+                color = errorColor
+            )
         },
     )
 }
-
-
-
 
 @Composable
 private fun TopContainer(navController: NavHostController) {

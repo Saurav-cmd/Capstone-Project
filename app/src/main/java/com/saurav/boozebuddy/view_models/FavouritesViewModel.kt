@@ -10,6 +10,7 @@ import com.saurav.boozebuddy.models.UserFavouritesModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,21 +57,23 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
     }
 
     fun fetchUserFavourites() {
-        try {
-
-            viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
+            try {
                 _isFetchingUserFavourites.postValue(true)
-                val favourites = favouritesImpl.getUserFavourites()
-                _userFavourites.postValue(favourites)
+                val favourites = withContext(Dispatchers.IO) {
+                    favouritesImpl.getUserFavourites()
+                }
+                _userFavourites.value = favourites // Update LiveData on the main thread
+                _isFetchingUserFavourites.postValue(false)
+            } catch (e: Exception) {
+                _isFetchingUserFavourites.postValue(false)
+                ErrorHandler.getErrorMessage(e)
+            } finally {
                 _isFetchingUserFavourites.postValue(false)
             }
-        } catch (e: Exception) {
-            _isFetchingUserFavourites.postValue(false)
-            ErrorHandler.getErrorMessage(e)
-        } finally {
-            _isFetchingUserFavourites.postValue(false)
         }
     }
+
 
     fun deleteFavourite(
         favouriteId: String,
