@@ -224,7 +224,6 @@ fun BottomContainer( authViewModel: AuthViewModel, navHostController: NavHostCon
         ) {
             showDialog = true
         }
-
         if (showDialog) {
             LogoutDialog(onDismiss = { showDialog = false }, authViewModel = authViewModel,navHostController, homeViewModel)
         }

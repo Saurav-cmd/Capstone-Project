@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -26,6 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,9 +41,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.WishlistModel
 import com.saurav.boozebuddy.ui.theme.errorColor
+import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 import java.util.Locale
@@ -110,7 +118,10 @@ private fun TopContainer() {
 
 @Composable
 private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel: WishlistViewModel) {
-    val context = LocalContext.current
+    val isDeletingWishList by wishlistViewModel.isDeletingWishList.observeAsState(initial = false)
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
     LazyColumn(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 5.dp, top = 10.dp)
     ) {
@@ -126,25 +137,93 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
                     color = colors.secondary,
                     fontSize = 18.sp
                 )
-                IconButton(onClick = {
-                    wishlistViewModel.deleteWishList(data.wishId){
-                        success, errMsg ->
-                        if(success){
-                            Toast.makeText(context, "Deleted Successfully", Toast.LENGTH_SHORT).show()
-                            wishlistViewModel.fetchWishlist()
-                        }else{
-                            Toast.makeText(context, "Error Cannot delete $errMsg", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color.Red
-                    )
-                }
+               if(isDeletingWishList){
+                   CircularProgressIndicator(
+                       color = secondaryColor
+                   )
+               }else {
+                   IconButton(onClick = {
+                       showDialog = true
+                   }) {
+                       Icon(
+                           imageVector = Icons.Default.Delete,
+                           contentDescription = "Delete",
+                           tint = Color.Red
+                       )
+                   }
+               }
             }
             Divider()
+
+
+            if (showDialog) {
+                DeleteDialog(onDismiss = { showDialog = false }, wishlistViewModel = wishlistViewModel, data.wishId)
+            }
         }
     }
+}
+
+@Composable
+fun DeleteDialog(
+    onDismiss: () -> Unit,
+    wishlistViewModel: WishlistViewModel,
+    wishListId: String
+) {
+    val isDeleting by wishlistViewModel.isDeletingWishList.observeAsState(initial = false)
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                onClick = {
+                    wishlistViewModel.deleteWishList(wishListId) { success, errMsg ->
+                        if (success) {
+                            Toast
+                                .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
+                                .show()
+                           wishlistViewModel.fetchWishlist()
+                        } else {
+                            Toast
+                                .makeText(context, "Error cannot delete $errMsg", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                    // Dismiss the dialog after logging out
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = secondaryColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                if (isDeleting) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = "Yes")
+                }
+
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = errorColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                Text(text = "No")
+            }
+        },
+        title = {
+            Text(
+                text = "Are you sure you want to delete?",
+                textAlign = TextAlign.Center,
+                color = errorColor
+            )
+        },
+    )
 }
