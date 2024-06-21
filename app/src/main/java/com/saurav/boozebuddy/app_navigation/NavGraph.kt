@@ -38,7 +38,7 @@ object NavGraph {
             composable(NavRoute.Splash.route) { SplashScreen(navController, authViewModel) }
             composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
             composable(NavRoute.SignUp.route) { SignupPage(navController, authViewModel) }
-            composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel) }
+            composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel, wishlistViewModel) }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController, favouritesViewModel) }
             composable(NavRoute.ProductListing.route + "/{products}/{brandName}/{brandId}") { backStackEntry ->
                 val productsJson = backStackEntry.arguments?.getString("products")

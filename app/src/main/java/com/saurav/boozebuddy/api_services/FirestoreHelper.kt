@@ -13,6 +13,8 @@ import com.saurav.boozebuddy.models.BrandModel
 import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserFavouritesModel
 import com.saurav.boozebuddy.models.UserModel
+import com.saurav.boozebuddy.models.WishListProducts
+import com.saurav.boozebuddy.models.WishlistModel
 import kotlinx.coroutines.tasks.await
 
 class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth: FirebaseAuth, private val database: FirebaseDatabase) {
@@ -171,6 +173,14 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
             val uid = currentUser.uid
 
+            // Add a new document to the 'wishlist' collection with auto-generated ID
+            val wishlistItemId = firestore.collection("users")
+                .document(uid)
+                .collection("wishlist")
+                .add(mapOf("folderName" to folderName)) // Store folderName directly under wishlist item
+                .await()
+                .id
+
             val productData = hashMapOf(
                 "productId" to productId.trim(),
                 "productName" to productName,
@@ -180,20 +190,57 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                 "brandId" to brandId.trim()
             )
 
+            // Add productData under folderName inside the wishlistItemId
             firestore.collection("users")
                 .document(uid)
                 .collection("wishlist")
-                .document(folderName)
-                .collection("products")
+                .document(wishlistItemId)
+                .collection(folderName)
                 .add(productData)
                 .await()
 
-            callback(true, "Favourite added successfully")
+            callback(true, "Wishlist item added successfully")
         } catch (e: Exception) {
             callback(false, "$e")
             ErrorHandler.getErrorMessage(e)
         }
     }
+
+
+
+    suspend fun fetchWishList(): List<WishlistModel> {
+        return try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            val wishListSnapshot = firestore.collection("users")
+                .document(uid)
+                .collection("wishlist")
+                .get()
+                .await()
+
+            val wishListData = wishListSnapshot.documents.mapNotNull { document ->
+                val wishName = document.getString("folderName") ?: return@mapNotNull null
+
+                val productsSnapshot = document.reference.collection(wishName).get().await()
+                val products = productsSnapshot.documents.mapNotNull { productDoc ->
+                    productDoc.toObject(WishListProducts::class.java)
+                }
+
+                WishlistModel(wishName, products).also {
+                    Log.d("WishlistItem", it.toString())
+                }
+            }
+
+            Log.d("Wishlist Data", wishListData.toString())
+            wishListData
+        } catch (e: Exception) {
+            Log.e("Fetch Wishlist", "Error fetching user wishlist: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+
 
 
 }

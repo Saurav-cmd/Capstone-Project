@@ -1,5 +1,7 @@
 package com.saurav.boozebuddy.app_interface.wish_list_interface
 
+import com.saurav.boozebuddy.models.WishlistModel
+
 interface WishlistInterface {
     suspend fun addWishList(
         folderName: String,
@@ -11,4 +13,7 @@ interface WishlistInterface {
         brandId: String,
         callback: (Boolean, String?) -> Unit
     )
+
+    suspend fun getWishList():List<WishlistModel>
+
 }

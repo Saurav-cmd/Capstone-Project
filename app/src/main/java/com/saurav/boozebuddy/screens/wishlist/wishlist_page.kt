@@ -15,12 +15,16 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,13 +40,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
+import com.saurav.boozebuddy.models.WishListProducts
+import com.saurav.boozebuddy.models.WishlistModel
 import com.saurav.boozebuddy.ui.theme.errorColor
 import com.saurav.boozebuddy.ui.theme.lightGrey
+import com.saurav.boozebuddy.ui.theme.secondaryColor
+import com.saurav.boozebuddy.view_models.WishlistViewModel
+import java.util.Locale
 
 
 @Composable
-@Preview(showBackground = true)
-fun WishListPage() {
+fun WishListPage(wishlistViewModel: WishlistViewModel) {
+
+    LaunchedEffect(Unit) {
+        wishlistViewModel.fetchWishlist()
+    }
+
+    val isFetchingWishList by wishlistViewModel.isFetchingWishList.observeAsState(initial = false)
+    val wishListData by wishlistViewModel.wishListValue.observeAsState(initial = emptyList())
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +66,32 @@ fun WishListPage() {
     ) {
         Spacer(modifier = Modifier.height(10.dp))
         TopContainer()
-        DetailContainer()
+        if(isFetchingWishList){
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(50.dp),
+                    color = secondaryColor,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(text = "Loading Wishlist...", color = secondaryColor, fontSize = 18.sp)
+            }
+        }else if(wishListData.isEmpty()){
+           Box(
+               modifier= Modifier.fillMaxSize(),
+               contentAlignment = Alignment.Center
+           ) {
+               Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
+           }
+        }
+        else{
+            DetailContainer(wishListData)
+        }
+
     }
 }
 
@@ -76,18 +116,18 @@ private fun TopContainer() {
 }
 
 @Composable
-private fun DetailContainer() {
+private fun DetailContainer(wishListData: List<WishlistModel>) {
     LazyColumn(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 5.dp)
     ) {
-        items(25) { index ->
-            // Replace with your item content
+        items(wishListData.size) { index ->
+            val data = wishListData[index]
            Row(
                modifier = Modifier.fillMaxWidth(),
                horizontalArrangement = Arrangement.SpaceBetween,
                verticalAlignment = Alignment.CenterVertically
            ) {
-               Text("Hello $index", color = colors.secondary)
+               Text(data.wishName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }, color=colors.secondary)
                IconButton(onClick = { /*TODO*/ },) {
                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                }

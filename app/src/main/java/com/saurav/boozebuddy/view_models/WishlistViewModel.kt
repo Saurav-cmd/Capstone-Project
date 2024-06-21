@@ -6,14 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurav.boozebuddy.api_services.ErrorHandler
 import com.saurav.boozebuddy.impl.wishlist_impl.WishlistImplementation
+import com.saurav.boozebuddy.models.WishlistModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WishlistViewModel @Inject constructor(val wishlistImplementation: WishlistImplementation) : ViewModel() {
+class WishlistViewModel @Inject constructor(private val wishlistImplementation: WishlistImplementation) : ViewModel() {
     private val _isStoringWishlist = MutableLiveData<Boolean>()
-    val isStoringWishList : LiveData<Boolean> get() = _isStoringWishlist
+    val isStoringWishList: LiveData<Boolean> get() = _isStoringWishlist
+
+    private val _isFetchingWishList = MutableLiveData<Boolean>()
+    val isFetchingWishList: LiveData<Boolean> get() = _isFetchingWishList
+
+    private val _wishListValue = MutableLiveData<List<WishlistModel>>()
+    val wishListValue: LiveData<List<WishlistModel>> get() = _wishListValue
 
     fun storeWishList(
         folderName: String,
@@ -24,20 +31,42 @@ class WishlistViewModel @Inject constructor(val wishlistImplementation: Wishlist
         productId: String,
         brandId: String,
         callback: (Boolean, String?) -> Unit
-    ){
-        try{
+    ) {
+        try {
+            _isStoringWishlist.value = true
             viewModelScope.launch {
-                _isStoringWishlist.postValue(true)
-                wishlistImplementation.addWishList(folderName, productName, productDesc,productImage, brandName, productId, brandId){
-                    success, errMsg ->
+                wishlistImplementation.addWishList(
+                    folderName,
+                    productName,
+                    productDesc,
+                    productImage,
+                    brandName,
+                    productId,
+                    brandId
+                ) { success, errMsg ->
                     callback(success, errMsg)
                 }
-                _isStoringWishlist.postValue(false)
             }
-        }catch (e: Exception){
-            _isStoringWishlist.postValue(false)
+        } catch (e: Exception) {
+            _isStoringWishlist.value = false
             ErrorHandler.getErrorMessage(e)
+        }finally {
+            _isStoringWishlist.value = false
         }
     }
 
+    fun fetchWishlist() {
+        _isFetchingWishList.value = true
+        viewModelScope.launch {
+            try {
+                val wishlist = wishlistImplementation.getWishList()
+                _wishListValue.value = wishlist
+            } catch (e: Exception) {
+                _isFetchingWishList.value = false
+                ErrorHandler.getErrorMessage(e)
+            } finally {
+                _isFetchingWishList.value = false
+            }
+        }
+    }
 }
