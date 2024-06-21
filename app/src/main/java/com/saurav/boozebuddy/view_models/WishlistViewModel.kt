@@ -22,6 +22,9 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
     private val _wishListValue = MutableLiveData<List<WishlistModel>>()
     val wishListValue: LiveData<List<WishlistModel>> get() = _wishListValue
 
+    private val _isDeletingWishlist = MutableLiveData<Boolean>()
+    val isDeletingWishList: LiveData<Boolean> get() = _isDeletingWishlist
+
     init {
         fetchWishlist()
     }
@@ -78,4 +81,23 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
             }
         }
     }
+
+    fun deleteWishList(wishListId: String, callback: (Boolean, String?) -> Unit){
+        try{
+            _isDeletingWishlist.value = true
+            viewModelScope.launch {
+                wishlistImplementation.deleteWishList(wishListId){
+                    success, errMsg ->
+                    callback(success,errMsg)
+                }
+            }
+        }catch (e:Exception){
+            _isDeletingWishlist.value = false
+            ErrorHandler.getErrorMessage(e)
+        }finally {
+            _isDeletingWishlist.value = false
+        }
+    }
+
+
 }

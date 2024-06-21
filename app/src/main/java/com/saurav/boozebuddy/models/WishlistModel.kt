@@ -1,8 +1,7 @@
 package com.saurav.boozebuddy.models
 
-import android.accounts.AuthenticatorDescription
-
 data class WishlistModel(
+    val wishId: String = "",
     val wishName: String = "" ,
     val wishListProducts: List<WishListProducts> = emptyList()
 )
