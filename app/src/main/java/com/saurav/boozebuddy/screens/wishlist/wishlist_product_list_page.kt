@@ -1,6 +1,7 @@
 package com.saurav.boozebuddy.screens.wishlist
 
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,39 +21,44 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.saurav.boozebuddy.R
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils
 import com.saurav.boozebuddy.models.WishListProducts
+import com.saurav.boozebuddy.ui.theme.errorColor
+import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 
 @Composable
-fun WishlistProductListingPage(navHostController: NavHostController,wishListData: List<WishListProducts>, wishlistViewModel: WishlistViewModel ) {
+fun WishlistProductListingPage(navHostController: NavHostController,wishListData: List<WishListProducts>, wishlistViewModel: WishlistViewModel, wishId:String, wishListName:String ) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -60,7 +66,9 @@ fun WishlistProductListingPage(navHostController: NavHostController,wishListData
         WishListProductsList(
             navController = navHostController,
             wishListData = wishListData,
-            wishlistViewModel
+            wishlistViewModel,
+            wishId,
+            wishListName
         )
     }
 }
@@ -101,11 +109,13 @@ private fun TopContainer(navController: NavHostController) {
 private fun WishListProductsList(
     navController : NavHostController,
     wishListData: List<WishListProducts>,
-    wishlistViewModel: WishlistViewModel
+    wishlistViewModel: WishlistViewModel,
+    wishId:String,
+    wishListName:String
 ) {
     LazyColumn(content = {
         items(count = wishListData.size) { index ->
-            WishListProductDesign(wishListData[index], wishlistViewModel)
+            WishListProductDesign(wishListData[index], wishlistViewModel, wishId, wishListName)
             Spacer(modifier = Modifier.height(15.dp))
         }
     })
@@ -116,7 +126,9 @@ private fun WishListProductsList(
 @Composable
 private fun WishListProductDesign(
     wishListProduct: WishListProducts,
-    wishlistViewModel: WishlistViewModel
+    wishlistViewModel: WishlistViewModel,
+    wishId:String,
+    wishListName:String
 ) {
     val sheetState = androidx.compose.material3.rememberModalBottomSheetState()
     var showModalBottomSheet by remember {
@@ -193,19 +205,19 @@ private fun WishListProductDesign(
                     )
                 }
             }
-            Icon(
-                painter = painterResource(id = R.drawable.delete),
-                contentDescription = "Delete",
-                tint = Color.Red,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        showDialog = true
-                    }
-            )
+//            Icon(
+//                painter = painterResource(id = R.drawable.delete),
+//                contentDescription = "Delete",
+//                tint = Color.Red,
+//                modifier = Modifier
+//                    .size(24.dp)
+//                    .clickable {
+//                        showDialog = true
+//                    }
+//            )
 
             if (showDialog) {
-                DeleteDialog(onDismiss = { showDialog = false }, wishlistViewModel, wishListProduct.productId)
+                DeleteDialog(onDismiss = { showDialog = false }, wishlistViewModel,wishListProduct.wishListProductId, wishId,  wishListName)
             }
         }
     }
@@ -260,7 +272,82 @@ private fun WishListProductDesign(
                         color = ThemeUtils.colors.secondary
                     )
                 )
+                Text(
+                    text = wishListProduct.productOrigin,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = ThemeUtils.colors.secondary
+                    )
+                )
             }
         }
     }
+}
+
+@Composable
+private fun DeleteDialog(
+    onDismiss: () -> Unit,
+    wishlistViewModel: WishlistViewModel,
+    wishListProductId: String,
+    wishId:String,
+    wishListName:String
+) {
+    val isDeleting by wishlistViewModel.isDeletingWishList.observeAsState(initial = false)
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                onClick = {
+                    wishlistViewModel.deleteWishListProduct(wishId, wishListProductId, wishListName) { success, errMsg ->
+                        if (success) {
+                            Toast
+                                .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
+                                .show()
+//                            wishlistViewModel.fetchWishlist()
+                        } else {
+                            Toast
+                                .makeText(context, "Error cannot delete $errMsg", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                    // Dismiss the dialog after logging out
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = secondaryColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                if (isDeleting) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = "Yes")
+                }
+
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = errorColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                Text(text = "No")
+            }
+        },
+        title = {
+            Text(
+                text = "Are you sure you want to delete?",
+                textAlign = TextAlign.Center,
+                color = errorColor
+            )
+        },
+    )
 }

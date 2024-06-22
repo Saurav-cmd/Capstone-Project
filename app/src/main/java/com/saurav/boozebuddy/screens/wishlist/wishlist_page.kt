@@ -135,7 +135,9 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
             Row(
                 modifier = Modifier.fillMaxWidth().clickable {
                     val jsonEncoded = Uri.encode(Gson().toJson(data.wishListProducts))
-                    navHostController.navigate("${NavRoute.WishListProductListingPage.route}/$jsonEncoded") {
+                    val wishId = Uri.encode(Gson().toJson(data.wishId))
+                    val wishName = Uri.encode(Gson().toJson(data.wishName))
+                    navHostController.navigate("${NavRoute.WishListProductListingPage.route}/$jsonEncoded/$wishId/$wishName") {
                         launchSingleTop = true
                     }
                 },
@@ -174,7 +176,7 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
 }
 
 @Composable
-fun DeleteDialog(
+private fun DeleteDialog(
     onDismiss: () -> Unit,
     wishlistViewModel: WishlistViewModel,
     wishListId: String

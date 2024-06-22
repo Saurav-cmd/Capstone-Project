@@ -18,5 +18,10 @@ data class Product(
     val productImage: String? = null,
     val productPrice: Double? = 0.0,
     val productQuantity: Int? = 0,
+    val productABV: Int? = 0,
+    val productIngredients: List<String>? = emptyList(),
+    val productOrigin: String? = "",
+    val productVolume: Int? = 0,
 )
+
 

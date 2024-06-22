@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurav.boozebuddy.api_services.ErrorHandler
 import com.saurav.boozebuddy.impl.wishlist_impl.WishlistImplementation
+import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.WishlistModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,6 +26,9 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
     private val _isDeletingWishlist = MutableLiveData<Boolean>()
     val isDeletingWishList: LiveData<Boolean> get() = _isDeletingWishlist
 
+    private val _isDeletingWishlistProduct = MutableLiveData<Boolean>()
+    val isDeletingWishlistProduct: LiveData<Boolean> get() = _isDeletingWishlistProduct
+
     init {
         fetchWishlist()
     }
@@ -37,6 +41,7 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
         brandName: String,
         productId: String,
         brandId: String,
+        product: Product,
         callback: (Boolean, String?) -> Unit
     ) {
         try {
@@ -50,7 +55,8 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
                         productImage,
                         brandName,
                         productId,
-                        brandId
+                        brandId,
+                        product
                     ) { success, errMsg ->
                         callback(success, errMsg)
                     }
@@ -96,6 +102,20 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
             ErrorHandler.getErrorMessage(e)
         }finally {
             _isDeletingWishlist.value = false
+        }
+    }
+
+    fun deleteWishListProduct(wishListId:String, wishListProductId: String,wishListName:String ,callback: (Boolean, String?) -> Unit){
+        try{
+            _isDeletingWishlistProduct.value = true
+            viewModelScope.launch {
+                wishlistImplementation.deleteWishlistProduct(wishListId, wishListProductId,wishListName ,callback)
+            }
+        }catch (e:Exception){
+            _isDeletingWishlistProduct.value = false
+            ErrorHandler.getErrorMessage(e)
+        }finally {
+            _isDeletingWishlistProduct.value = false
         }
     }
 

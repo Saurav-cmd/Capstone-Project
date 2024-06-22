@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurav.boozebuddy.api_services.ErrorHandler
 import com.saurav.boozebuddy.impl.favourites_impl.FavouritesImpl
+import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserFavouritesModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,7 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
         productImage: String,
         productId: String,
         brandId: String,
+        product: Product,
         callback: (Boolean, String?) -> Unit
     ) {
         _isStoringFavourites.postValue(true)
@@ -44,7 +46,8 @@ class FavouritesViewModel @Inject constructor(private val favouritesImpl: Favour
                     brandName,
                     productImage,
                     productId,
-                    brandId
+                    brandId,
+                    product
                 ) { success, errMsg ->
                     callback(success, errMsg)
                 }

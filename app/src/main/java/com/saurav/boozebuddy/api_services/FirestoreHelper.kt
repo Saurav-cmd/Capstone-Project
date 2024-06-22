@@ -17,7 +17,11 @@ import com.saurav.boozebuddy.models.WishListProducts
 import com.saurav.boozebuddy.models.WishlistModel
 import kotlinx.coroutines.tasks.await
 
-class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth: FirebaseAuth, private val database: FirebaseDatabase) {
+class FirestoreHelper(
+    private val firestore: FirebaseFirestore,
+    private val auth: FirebaseAuth,
+    private val database: FirebaseDatabase
+) {
 
     suspend fun fetchBrandsWithProducts(): List<BrandModel> {
         return try {
@@ -31,7 +35,7 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                         productDocument.toObject(Product::class.java)
                             ?.copy(productId = productDocument.id)
                     }
-                    Log.e("THis is brands data","${brand.brandName}")
+                    Log.e("THis is brands data", "${brand.brandName}")
                     brand.copy(products = products)
                 } else {
                     //brand is empty
@@ -71,6 +75,7 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         productImage: String,
         productId: String,
         brandId: String,
+        product: Product,
         callback: (Boolean, String?) -> Unit
     ) {
         try {
@@ -82,7 +87,11 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                 "productName" to productName,
                 "brandName" to brandName,
                 "productImage" to productImage,
-                "brandId" to brandId.trim()
+                "brandId" to brandId.trim(),
+                "productABV" to product.productABV,
+                "productVolume" to product.productVolume,
+                "productOrigin" to product.productOrigin,
+                "productIngredients" to product.productIngredients
             )
             Log.e("This is the body of favourites: ", "$favourite")
             firestore.collection("users")
@@ -148,12 +157,17 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         val bannerReference = database.getReference("banner")
         bannerReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val banners = dataSnapshot.children.mapNotNull { it.getValue(BannerModel::class.java) }
+                val banners =
+                    dataSnapshot.children.mapNotNull { it.getValue(BannerModel::class.java) }
                 callback(banners)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("RealtimeDatabaseHelper", "Error fetching banner data", databaseError.toException())
+                Log.e(
+                    "RealtimeDatabaseHelper",
+                    "Error fetching banner data",
+                    databaseError.toException()
+                )
                 callback(null)
             }
         })
@@ -167,6 +181,7 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
         brandName: String,
         productId: String,
         brandId: String,
+        product: Product,
         callback: (Boolean, String?) -> Unit
     ) {
         try {
@@ -201,7 +216,11 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
                 "productDescription" to productDesc,
                 "brandName" to brandName,
                 "productImage" to productImage,
-                "brandId" to brandId.trim()
+                "brandId" to brandId.trim(),
+                "productABV" to product.productABV,
+                "productVolume" to product.productVolume,
+                "productOrigin" to product.productOrigin,
+                "productIngredients" to product.productIngredients
             )
 
             // Add productData under folderName inside the wishlistItemId
@@ -219,7 +238,6 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             ErrorHandler.getErrorMessage(e)
         }
     }
-
 
 
     suspend fun fetchWishList(): List<WishlistModel> {
@@ -277,4 +295,39 @@ class FirestoreHelper(private val firestore: FirebaseFirestore, private val auth
             callback(false, e.message)
         }
     }
+
+    suspend fun deleteWishListProduct(
+        wishListId: String,
+        wishListProductId: String,
+        wishListName: String,
+        callback: (Boolean, String?) -> Unit
+    ) {
+        try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            // Get a reference to the user's document
+            val userRef = firestore.collection("users").document(uid)
+
+            // Get a reference to the product within the specific wishlist
+            val wishListProductRef = userRef.collection("wishlist")
+                .document(wishListId)
+                .collection("products")
+                .document(wishListProductId)
+
+            // Check if the document exists
+            val documentSnapshot = wishListProductRef.get().await()
+            if (documentSnapshot.exists()) {
+                // Delete the document
+                wishListProductRef.delete().await()
+                callback(true, null)
+            } else {
+                callback(false, "Document not found")
+            }
+        } catch (e: Exception) {
+            Log.e("WishList Impl", "Error deleting wishlist: ${e.message}", e)
+            callback(false, e.message)
+        }
+    }
+
 }

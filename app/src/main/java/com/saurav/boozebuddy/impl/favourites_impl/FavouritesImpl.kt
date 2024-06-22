@@ -3,6 +3,7 @@ package com.saurav.boozebuddy.impl.favourites_impl
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saurav.boozebuddy.api_services.FirestoreHelper
 import com.saurav.boozebuddy.app_interface.favourites_interface.FavouritesInterface
+import com.saurav.boozebuddy.models.Product
 import com.saurav.boozebuddy.models.UserFavouritesModel
 import javax.inject.Inject
 
@@ -14,9 +15,10 @@ class FavouritesImpl @Inject constructor(private val firestoreHelper: FirestoreH
         productImage: String,
         productId: String,
         brandId: String,
+        product: Product,
         callback: (Boolean, String?) -> Unit
     ) {
-        firestoreHelper.storeUSerFavourites(productName, brandName, productImage, productId, brandId){success, errMsg->
+        firestoreHelper.storeUSerFavourites(productName, brandName, productImage, productId, brandId, product){success, errMsg->
             callback(success,errMsg)
         }
     }

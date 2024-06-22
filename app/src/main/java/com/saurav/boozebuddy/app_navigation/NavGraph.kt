@@ -1,4 +1,3 @@
-@file:Suppress("DEPRECATION")
 
 package com.saurav.boozebuddy.app_navigation
 
@@ -63,11 +62,17 @@ object NavGraph {
 
                 ProductsDetailPage(navController, favouritesViewModel, productData, brandName, brandId, wishlistViewModel)
             }
-            composable(NavRoute.WishListProductListingPage.route + "/{wishlistProducts}") { backStackEntry ->
+            composable(NavRoute.WishListProductListingPage.route + "/{wishlistProducts}/{wishId}/{wishName}") { backStackEntry ->
                 val wishListProductJson = backStackEntry.arguments?.getString("wishlistProducts")
+                val wishIdJson = backStackEntry.arguments?.getString("wishId")
+                val wishNameJson = backStackEntry.arguments?.getString("wishName")
+
                 val productType = object : TypeToken<List<WishListProducts>>() {}.type
+
                 val wishlistProductData: List<WishListProducts> = Gson().fromJson(wishListProductJson, productType)
-                WishlistProductListingPage(navHostController = navController, wishListData = wishlistProductData, wishlistViewModel)
+                val wishId: String = Gson().fromJson(wishIdJson, String::class.java)
+                val wishName: String = Gson().fromJson(wishNameJson, String::class.java)
+                WishlistProductListingPage(navHostController = navController, wishListData = wishlistProductData, wishlistViewModel, wishId, wishName)
             }
 
         }

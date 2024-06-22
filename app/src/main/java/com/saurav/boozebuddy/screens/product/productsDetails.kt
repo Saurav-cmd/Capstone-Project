@@ -1,5 +1,6 @@
 package com.saurav.boozebuddy.screens.product
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,6 +34,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -72,6 +73,7 @@ import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 import java.util.Locale
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProductsDetailPage(
     navHostController: NavHostController,
@@ -81,30 +83,37 @@ fun ProductsDetailPage(
     brandId: String?,
     wishlistViewModel: WishlistViewModel
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = lightGrey)
-    ) {
-        item {
-            ProductImage(navHostController, productInfo.productImage)
+    Scaffold(
+        bottomBar = {
+            AddWishListButton(navHostController, wishlistViewModel, productInfo, brandName, brandId)
         }
-        item {
-            ProductDetailsSection(
-                productInfo.productName,
-                productInfo.productDescription,
-                favouritesViewModel,
-                productInfo.productImage ?: "",
-                productInfo.productId,
-                brandName,
-                brandId,
-                navHostController,
-                wishlistViewModel,
-                productInfo
-            )
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = lightGrey)
+        ) {
+            item {
+                ProductImage(navHostController, productInfo.productImage)
+            }
+            item {
+                ProductDetailsSection(
+                    productInfo.productName,
+                    productInfo.productDescription,
+                    favouritesViewModel,
+                    productInfo.productImage ?: "",
+                    productInfo.productId,
+                    brandName,
+                    brandId,
+                    navHostController,
+                    wishlistViewModel,
+                    productInfo
+                )
+            }
         }
     }
 }
+
 
 
 @Composable
@@ -185,12 +194,10 @@ fun ProductDetailsSection(
                 productImage,
                 productId,
                 brandName,
-                brandId
+                brandId,productInfo
             )
             Spacer(modifier = Modifier.height(25.dp))
-//            PriceAndQuantity()
-            Spacer(modifier = Modifier.weight(1f)) // Fill remaining space
-            AddCartButton(navHostController, wishlistViewModel, productInfo, brandName, brandId)
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -204,7 +211,8 @@ private fun Details(
     productImage: String,
     productId: String?,
     brandName: String?,
-    brandId: String?
+    brandId: String?,
+    productInfo: Product,
 ) {
     val context = LocalContext.current
     val isAddingToFavourite by favouritesViewModel.isStoringFavourites.observeAsState(initial = false)
@@ -219,7 +227,7 @@ private fun Details(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "$productName",
+                text = "$productName (${productInfo.productVolume} ml)",
                 style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                 color = Color.Black,
                 textAlign = TextAlign.Center
@@ -238,7 +246,8 @@ private fun Details(
                             brandName ?: "",
                             productImage,
                             productId ?: "",
-                            brandId ?: ""
+                            brandId ?: "",
+                            productInfo
                         ) { success, errMsg ->
                             if (success) {
                                 Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
@@ -267,9 +276,51 @@ private fun Details(
 
             }
         }
-        Spacer(modifier = Modifier.height(5.dp))
+//        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = "Made in: ${productInfo.productOrigin}",
+            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+            color = Color.Black,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         Description(productDetail)
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "Ingredients",
+            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+            color = Color.Black,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        DisplayIngredients(ingredients = productInfo.productIngredients)
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "Alcohol Percentage",
+            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+            color = Color.Black,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = "${productInfo.productABV}%",
+            style = TextStyle(fontSize = 14.sp),
+            color = Color.Black,
+            textAlign = TextAlign.Center
+        )
+
     }
+}
+
+@Composable
+fun DisplayIngredients(ingredients: List<String>?) {
+    val formattedIngredients = ingredients?.joinToString(", ")
+    Text(
+        text = formattedIngredients ?: "",
+        style = TextStyle(fontSize = 14.sp),
+        color = Color.Black,
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
@@ -282,76 +333,9 @@ private fun Description(productDetail: String?) {
     )
 }
 
-@Composable
-private fun PriceAndQuantity() {
-    Column {
-        Text(
-            text = "Price and Quantity",
-            modifier = Modifier.padding(start = 10.dp),
-            color = Color.Black,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color.LightGray)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        "30 Available",
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Text("$24.00", style = TextStyle(fontSize = 14.sp, color = Color.Black))
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    QuantityBoxDesign(value = "-")
-                    Spacer(modifier = Modifier.width(5.dp))
-                    QuantityBoxDesign(value = "1")
-                    Spacer(modifier = Modifier.width(5.dp))
-                    QuantityBoxDesign(value = "+")
-                }
-            }
-        }
-    }
-}
 
 @Composable
-private fun QuantityBoxDesign(value: String) {
-    Box(
-        modifier = Modifier
-            .size(height = 20.dp, width = 20.dp)
-            .background(Color.Gray)
-    ) {
-        Text(
-            text = value,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.Center),
-            color = primaryColor
-        )
-    }
-}
-
-@Composable
-fun AddCartButton(
+fun AddWishListButton(
     navHostController: NavHostController,
     wishlistViewModel: WishlistViewModel,
     productInfo: Product,
@@ -406,7 +390,6 @@ fun WishListDialog(
     brandName: String?,
     brandId: String?,
 ) {
-
     // State variables
     val isStoringWishlist by wishlistViewModel.isStoringWishList.observeAsState(initial = false)
     var wishlistName by remember { mutableStateOf("") }
@@ -423,7 +406,32 @@ fun WishListDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (selectedWishlistIndex != -1) {
+                    if (wishlistName.isNotBlank()) {
+                        val existingWishlist = wishListData.find { it.wishName == wishlistName }
+                        if (existingWishlist != null) {
+                            Toast.makeText(context, "Wishlist name already exists", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // User wants to create a new wishlist
+                            wishlistViewModel.storeWishList(
+                                wishlistName,
+                                productInfo.productName ?: "",
+                                productInfo.productDescription ?: "",
+                                productInfo.productImage ?: "",
+                                brandName ?: "",
+                                productInfo.productId,
+                                brandId ?: "",
+                                productInfo,
+                            ) { success, errMsg ->
+                                if (success) {
+                                    Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                                    wishlistViewModel.fetchWishlist()
+                                } else {
+                                    Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            onDismiss()
+                        }
+                    } else if (selectedWishlistIndex != -1) {
                         // User selected an existing wishlist
                         val selectedWishlist = wishListData[selectedWishlistIndex]
                         wishlistViewModel.storeWishList(
@@ -433,7 +441,8 @@ fun WishListDialog(
                             productInfo.productImage ?: "",
                             brandName ?: "",
                             productInfo.productId,
-                            brandId ?: ""
+                            brandId ?: "",
+                            productInfo,
                         ) { success, errMsg ->
                             if (success) {
                                 Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
@@ -442,26 +451,10 @@ fun WishListDialog(
                                 Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
                             }
                         }
+                        onDismiss()
                     } else {
-                        // User wants to create a new wishlist
-                        wishlistViewModel.storeWishList(
-                            wishlistName,
-                            productInfo.productName ?: "",
-                            productInfo.productDescription ?: "",
-                            productInfo.productImage ?: "",
-                            brandName ?: "",
-                            productInfo.productId,
-                            brandId ?: ""
-                        ) { success, errMsg ->
-                            if (success) {
-                                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                                wishlistViewModel.fetchWishlist()
-                            } else {
-                                Toast.makeText(context, "Error $errMsg", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        Toast.makeText(context, "Please enter a wishlist name or select an existing wishlist", Toast.LENGTH_SHORT).show()
                     }
-                    onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = secondaryColor,
@@ -542,6 +535,7 @@ fun WishListDialog(
                     }
                 } else if (wishListData.isEmpty()) {
                     // Handle case when wishlist data is empty
+                    Text(text = "No wishlist available", color = secondaryColor, fontSize = 16.sp)
                 } else {
                     LazyColumn(
                         modifier = Modifier
@@ -577,6 +571,7 @@ fun WishListDialog(
         }
     )
 }
+
 
 
 

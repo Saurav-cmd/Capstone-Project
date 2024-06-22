@@ -10,4 +10,8 @@ data class UserFavouritesModel(
     val productId: String = "",
     val productImage: String = "",
     val productName: String = "",
+    val productABV: Int = 0,
+    val productVolume: Int = 0,
+    val productIngredients: List<String> = emptyList(),
+    val productOrigin: String = ""
 )
