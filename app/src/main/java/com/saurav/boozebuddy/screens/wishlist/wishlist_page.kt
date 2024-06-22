@@ -1,7 +1,9 @@
 package com.saurav.boozebuddy.screens.wishlist
 
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +44,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavHostController
+import com.google.gson.Gson
+import com.saurav.boozebuddy.app_navigation.NavRoute
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.WishlistModel
 import com.saurav.boozebuddy.ui.theme.errorColor
@@ -52,7 +57,7 @@ import java.util.Locale
 
 
 @Composable
-fun WishListPage(wishlistViewModel: WishlistViewModel) {
+fun WishListPage(wishlistViewModel: WishlistViewModel, navHostController: NavHostController) {
 
     LaunchedEffect(Unit) {
         wishlistViewModel.fetchWishlist()
@@ -90,7 +95,7 @@ fun WishListPage(wishlistViewModel: WishlistViewModel) {
                 Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
             }
         } else {
-            DetailContainer(wishListData, wishlistViewModel)
+            DetailContainer(wishListData, wishlistViewModel, navHostController)
         }
 
     }
@@ -117,7 +122,7 @@ private fun TopContainer() {
 }
 
 @Composable
-private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel: WishlistViewModel) {
+private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel: WishlistViewModel, navHostController: NavHostController) {
     val isDeletingWishList by wishlistViewModel.isDeletingWishList.observeAsState(initial = false)
     var showDialog by remember {
         mutableStateOf(false)
@@ -128,7 +133,12 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
         items(wishListData.size) { index ->
             val data = wishListData[index]
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().clickable {
+                    val jsonEncoded = Uri.encode(Gson().toJson(data.wishListProducts))
+                    navHostController.navigate("${NavRoute.WishListProductListingPage.route}/$jsonEncoded") {
+                        launchSingleTop = true
+                    }
+                },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

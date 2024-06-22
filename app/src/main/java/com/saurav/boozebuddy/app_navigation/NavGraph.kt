@@ -5,7 +5,6 @@ package com.saurav.boozebuddy.app_navigation
 
 import FavouritesListPage
 import SignupPage
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,6 +12,7 @@ import androidx.navigation.compose.composable
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.saurav.boozebuddy.models.Product
+import com.saurav.boozebuddy.models.WishListProducts
 import com.saurav.boozebuddy.screens.SplashScreen
 import com.saurav.boozebuddy.screens.auth.LoginPage
 import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
@@ -61,10 +61,14 @@ object NavGraph {
                 val brandName: String = Gson().fromJson(brandNameJson, String::class.java)
                 val brandId: String = Gson().fromJson(brandIdJson, String::class.java)
 
-                Log.e("When passing the data: ", "$brandId ${productData.productId}")
                 ProductsDetailPage(navController, favouritesViewModel, productData, brandName, brandId, wishlistViewModel)
             }
-            composable(NavRoute.WishListProductListingPage.route) { WishlistProductListingPage(navController) }
+            composable(NavRoute.WishListProductListingPage.route + "/{wishlistProducts}") { backStackEntry ->
+                val wishListProductJson = backStackEntry.arguments?.getString("wishlistProducts")
+                val productType = object : TypeToken<List<WishListProducts>>() {}.type
+                val wishlistProductData: List<WishListProducts> = Gson().fromJson(wishListProductJson, productType)
+                WishlistProductListingPage(navHostController = navController, wishListData = wishlistProductData, wishlistViewModel)
+            }
 
         }
     }
