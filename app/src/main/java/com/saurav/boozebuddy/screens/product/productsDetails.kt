@@ -308,7 +308,7 @@ private fun Details(
             color = Color.Black,
             textAlign = TextAlign.Center
         )
-
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
@@ -348,7 +348,7 @@ fun AddWishListButton(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(16.dp) // Adjust padding as needed
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         Button(
             onClick = {
