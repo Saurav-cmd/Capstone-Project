@@ -1,4 +1,7 @@
 package com.saurav.boozebuddy
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,12 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.saurav.boozebuddy.app_navigation.NavGraph
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
-import com.saurav.boozebuddy.screens.auth.LoginPage
-import com.saurav.boozebuddy.screens.bottom_navigation.BottomNavigationBarMain
-import com.saurav.boozebuddy.screens.home.HomePage
 import com.saurav.boozebuddy.ui.theme.BoozeBuddyTheme
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
@@ -28,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private val wishlistViewModel: WishlistViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestNotificationPermission()
         setContent {
             BoozeBuddyTheme {
                 Surface(
@@ -36,6 +39,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                    MyApp(authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel)
                 }
+            }
+        }
+    }
+
+    private fun requestNotificationPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasPermission) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
             }
         }
     }

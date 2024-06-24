@@ -77,6 +77,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
     implementation("androidx.datastore:datastore-core-android:1.1.1")
+    implementation("com.google.firebase:firebase-messaging-ktx:24.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -86,7 +87,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("com.exyte:animated-navigation-bar:1.0.0")
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta02")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta03")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.19.0")
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -94,9 +95,9 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.50")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.19.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
     implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
@@ -107,15 +108,6 @@ dependencies {
     //for caruosel slider of the banner
     implementation("com.google.accompanist:accompanist-pager:0.24.10-beta")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.24.10-beta")
-
-    //Modal Bottomsheet
-//    implementation("androidx.compose.material:material:1.4.0")
-//    implementation("androidx.compose.ui:ui:1.4.0")
-
-
-
-
-
 }
 
 kapt {
