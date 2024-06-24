@@ -61,66 +61,75 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     val banners by homeViewModel.banners.observeAsState(emptyList())
     val isLoadingBanner by homeViewModel.isLoadingBanners.observeAsState(initial = false)
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
-            .imePadding(), // Adds padding for the on-screen keyboard if needed
-        contentPadding = PaddingValues(vertical = 10.dp)
-    ) {
-        item { GreetingContainer(navController, homeViewModel) }
-        item { Spacer(modifier = Modifier.height(10.dp)) }
-//        item { SearchField("Search your favourite brand") }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-        item {
-            if(isLoadingBanner){
-                Card(
-                    shape = RoundedCornerShape(10.dp),
-                    elevation = CardDefaults.cardElevation(1.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp) // Ensure the Card takes full width and height
-                        .padding(16.dp) // Add padding to center the CircularProgressIndicator
-                ){
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = colors.secondary)
-                    }
-                }
-            }else{
-                Banner(banners)
-            }
-
+    Scaffold(
+        topBar = {
+            GreetingContainer(navController, homeViewModel)
         }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-        item { TopBrandsLine() }
-        item { Spacer(modifier = Modifier.height(16.dp)) }
-        item {
-            if (isLoading) {
-               Column(
-                   modifier = Modifier.fillMaxWidth(),
-                   horizontalAlignment = Alignment.CenterHorizontally,
-                   verticalArrangement = Arrangement.Center
-               ) {
-                   CircularProgressIndicator(
-                       modifier = Modifier.size(50.dp),
-                       color = secondaryColor,
-                       strokeWidth = 2.dp
-                   )
-                   Spacer(modifier = Modifier.height(5.dp))
-                   Text(text = "Loading Brands...", color = secondaryColor, fontSize = 18.sp)
-               }
-            } else if (brands.isEmpty()) {
-                Text(
-                    text = "Brands are not available",
-                    color = colors.onSurface,
-                    modifier = Modifier.padding(16.dp),
-                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                )
-            } else {
-                TopBrandsGridView(navController, brands)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it) // Apply scaffold's inner padding
+                .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
+                .imePadding(), // Adds padding for the on-screen keyboard if needed
+            contentPadding = PaddingValues(vertical = 10.dp)
+        ) {
+            item { Spacer(modifier = Modifier.height(10.dp)) }
+            // item { SearchField("Search your favourite brand") }
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+            item {
+                if (isLoadingBanner) {
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
+                        elevation = CardDefaults.cardElevation(1.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp) // Ensure the Card takes full width and height
+                            .padding(16.dp) // Add padding to center the CircularProgressIndicator
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = colors.secondary)
+                        }
+                    }
+                } else {
+                    Banner(banners)
+                }
+            }
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+            item { TopBrandsLine() }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item {
+                if (isLoading) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(50.dp),
+                            color = secondaryColor,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Text(
+                            text = "Loading Brands...",
+                            color = secondaryColor,
+                            fontSize = 18.sp
+                        )
+                    }
+                } else if (brands.isEmpty()) {
+                    Text(
+                        text = "Brands are not available",
+                        color = colors.onSurface,
+                        modifier = Modifier.padding(16.dp),
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    )
+                } else {
+                    TopBrandsGridView(navController, brands)
+                }
             }
         }
     }
@@ -209,7 +218,7 @@ private fun GreetingContainer(navController: NavHostController, homeViewModel: H
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp,),
+            .padding(horizontal = 20.dp,).padding(top = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {

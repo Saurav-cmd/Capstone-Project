@@ -28,6 +28,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,30 +74,35 @@ fun FavouritesListPage(navController: NavHostController, favouritesViewModel: Fa
     val isLoadingFavourites by favouritesViewModel.isFetchingUserFavourites.observeAsState(initial = false)
     val favouritesData by favouritesViewModel.userFavourites.observeAsState(initial = emptyList())
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
-            .imePadding()
+    Scaffold(
+        topBar = {
+            TopContainer(navController = navController)
+        }
     ) {
-        TopContainer(navController = navController)
-        Spacer(modifier = Modifier.height(15.dp))
-        if (isLoadingFavourites) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = colors.secondary)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
+                .imePadding().padding(it)
+        ) {
+            Spacer(modifier = Modifier.height(15.dp))
+            if (isLoadingFavourites) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = colors.secondary)
+                }
+            } else if (favouritesData.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "No Favourites!", fontSize = 18.sp, color = colors.error)
+                }
+            } else {
+                FavouritesList(favouritesData, favouritesViewModel)
             }
-        } else if (favouritesData.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "No Favourites!", fontSize = 18.sp, color = colors.error)
-            }
-        } else {
-            FavouritesList(favouritesData, favouritesViewModel)
         }
     }
 }
@@ -225,7 +231,8 @@ private fun FavouritesDesign(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp).clip(shape = RoundedCornerShape(2.dp))
+                        .height(180.dp)
+                        .clip(shape = RoundedCornerShape(2.dp))
                 ) {
                     val painter =
                         rememberAsyncImagePainter(
@@ -348,7 +355,7 @@ private fun TopContainer(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+            .padding(horizontal = 10.dp).padding(top = 10.dp),
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
@@ -356,7 +363,7 @@ private fun TopContainer(navController: NavHostController) {
             tint = colors.secondary,
             modifier = Modifier
                 .padding(10.dp)
-                .size(30.dp)
+                .size(25.dp)
                 .align(Alignment.CenterStart)
                 .clickable {
                     navController.navigateUp()
@@ -367,7 +374,7 @@ private fun TopContainer(navController: NavHostController) {
             text = "Favourites",
             style = TextStyle(
                 color = colors.secondary,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             ),
             modifier = Modifier.align(Alignment.Center)

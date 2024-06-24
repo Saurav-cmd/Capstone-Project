@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,60 +66,59 @@ fun WishListPage(wishlistViewModel: WishlistViewModel, navHostController: NavHos
 
     val isFetchingWishList by wishlistViewModel.isFetchingWishList.observeAsState(initial = false)
     val wishListData by wishlistViewModel.wishListValue.observeAsState(initial = emptyList())
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
-            .imePadding(), // Adds padding for the on-screen keyboard if needed
-    ) {
-        Spacer(modifier = Modifier.height(10.dp))
-        TopContainer()
-        if (isFetchingWishList) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp),
-                    color = secondaryColor,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(text = "Loading Wishlist...", color = secondaryColor, fontSize = 18.sp)
-            }
-        } else if (wishListData.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
-            }
-        } else {
-            DetailContainer(wishListData, wishlistViewModel, navHostController)
-        }
 
+    Scaffold(
+        topBar = {
+            TopContainer()
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize().padding(it)
+                .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
+                .imePadding(), // Adds padding for the on-screen keyboard if needed
+        ) {
+            Spacer(modifier = Modifier.height(10.dp))
+            if (isFetchingWishList) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(50.dp),
+                        color = secondaryColor,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Loading Wishlist...", color = secondaryColor, fontSize = 18.sp)
+                }
+            } else if (wishListData.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
+                }
+            } else {
+                DetailContainer(wishListData, wishlistViewModel, navHostController)
+            }
+
+        }
     }
 }
 
 @Composable
 private fun TopContainer() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp)
-    ) {
-        Text(
-            text = "WishList",
-            style = TextStyle(
-                color = colors.secondary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.Center)
+    Text(
+        text = "WishList",
+        modifier = Modifier.padding(horizontal = 20.dp).padding(top = 10.dp),
+        style = TextStyle(
+            color = colors.secondary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
-    }
+    )
 }
 
 @Composable
@@ -133,14 +133,16 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
         items(wishListData.size) { index ->
             val data = wishListData[index]
             Row(
-                modifier = Modifier.fillMaxWidth().clickable {
-                    val jsonEncoded = Uri.encode(Gson().toJson(data.wishListProducts))
-                    val wishId = Uri.encode(Gson().toJson(data.wishId))
-                    val wishName = Uri.encode(Gson().toJson(data.wishName))
-                    navHostController.navigate("${NavRoute.WishListProductListingPage.route}/$jsonEncoded/$wishId/$wishName") {
-                        launchSingleTop = true
-                    }
-                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val jsonEncoded = Uri.encode(Gson().toJson(data.wishListProducts))
+                        val wishId = Uri.encode(Gson().toJson(data.wishId))
+                        val wishName = Uri.encode(Gson().toJson(data.wishName))
+                        navHostController.navigate("${NavRoute.WishListProductListingPage.route}/$jsonEncoded/$wishId/$wishName") {
+                            launchSingleTop = true
+                        }
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

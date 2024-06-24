@@ -1,6 +1,5 @@
 package com.saurav.boozebuddy.screens.notification
 
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,38 +31,50 @@ import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.ui.theme.containerColor
 import com.saurav.boozebuddy.ui.theme.lightGrey
-import com.saurav.boozebuddy.ui.theme.primaryColor
 
 
 @Composable
 @Preview
 fun NotificationPage() {
-    LazyColumn(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
-        content = {
-            item {
-                TopContainer()
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-            item {
-                NotificationContainerDesign()
-            }
-        })
+    Scaffold(
+        topBar = {
+            TopContainer()
+        }
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 20.dp)
+                .padding(it),
+            content = {
+                item {
+                    NotificationContainerDesign()
+                }
+            })
+    }
 }
 
 @Composable
 private fun TopContainer() {
     return Row(
-        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "Notification",
-            style = TextStyle(color = colors.secondary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            style = TextStyle(
+                color = colors.secondary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
 
         Text(
             text = "Filter",
-            style = TextStyle(color = containerColor, fontSize = 16.sp, fontWeight = FontWeight.W500)
+            style = TextStyle(
+                color = containerColor,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.W500
+            )
         )
     }
 }
@@ -104,10 +116,12 @@ private fun NotificationContainerDesign() {
                     )
                 )
                 Spacer(modifier = Modifier.height(5.dp))
-                Text(text = "2h ago", style = TextStyle(
-                    fontSize = 14.sp,
-                    color = Color.Black,
-                ))
+                Text(
+                    text = "2h ago", style = TextStyle(
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                    )
+                )
             }
 
         }

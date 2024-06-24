@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -67,27 +68,43 @@ fun ProductListingScreen(
 ) {
     val filteredProducts by homeViewModel.filteredProduct.observeAsState(initial = emptyList())
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding()
-            .imePadding(),
-        contentPadding = PaddingValues(vertical = 10.dp)
-    ) {
-        item {
+    Scaffold(
+        topBar = {
             TopContainer(navHostController, homeViewModel)
         }
-        item {
-            SearchBar(homeViewModel, productsJson)
-            Spacer(modifier = Modifier.height(25.dp))
-        }
-        item {
-            if(filteredProducts.isEmpty()){
-                ProductGridView(navHostController, productsJson, brandName, brandId, homeViewModel)
-            }else{
-                ProductGridView(navHostController, filteredProducts, brandName, brandId, homeViewModel)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .padding(it)
+                .imePadding(),
+            contentPadding = PaddingValues(vertical = 10.dp)
+        ) {
+            item {
+                SearchBar(homeViewModel, productsJson)
+                Spacer(modifier = Modifier.height(25.dp))
             }
+            item {
+                if (filteredProducts.isEmpty()) {
+                    ProductGridView(
+                        navHostController,
+                        productsJson,
+                        brandName,
+                        brandId,
+                        homeViewModel
+                    )
+                } else {
+                    ProductGridView(
+                        navHostController,
+                        filteredProducts,
+                        brandName,
+                        brandId,
+                        homeViewModel
+                    )
+                }
 
+            }
         }
     }
 }
@@ -95,7 +112,9 @@ fun ProductListingScreen(
 @Composable
 private fun TopContainer(navController: NavHostController, homeViewModel: HomeViewModel) {
     Box(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp).padding(top = 10.dp),
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
@@ -103,7 +122,7 @@ private fun TopContainer(navController: NavHostController, homeViewModel: HomeVi
             tint = colors.secondary,
             modifier = Modifier
                 .padding(10.dp)
-                .size(30.dp)
+                .size(25.dp)
                 .align(Alignment.CenterStart)
                 .clickable {
                     navController.navigateUp()
@@ -115,7 +134,7 @@ private fun TopContainer(navController: NavHostController, homeViewModel: HomeVi
             text = "Products",
             style = TextStyle(
                 color = colors.secondary,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             ),
             modifier = Modifier.align(Alignment.Center)
@@ -142,7 +161,7 @@ private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) 
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp,top = 10.dp, end = 20.dp)
+            .padding(start = 20.dp, top = 10.dp, end = 20.dp)
             .border(1.dp, colors.secondary, RoundedCornerShape(10.dp)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.colors(
@@ -159,7 +178,13 @@ private fun SearchBar(homeViewModel: HomeViewModel, productData: List<Product>) 
 }
 
 @Composable
-fun ProductGridView(navController: NavHostController, productData: List<Product>, brandName: String?, brandId: String?, homeViewModel: HomeViewModel) {
+fun ProductGridView(
+    navController: NavHostController,
+    productData: List<Product>,
+    brandName: String?,
+    brandId: String?,
+    homeViewModel: HomeViewModel
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -196,7 +221,13 @@ fun ProductGridView(navController: NavHostController, productData: List<Product>
 }
 
 @Composable
-fun GridItem(item: Product, navHostController: NavHostController, passedBrandName: String?, passedBrandId: String?, homeViewModel: HomeViewModel) {
+fun GridItem(
+    item: Product,
+    navHostController: NavHostController,
+    passedBrandName: String?,
+    passedBrandId: String?,
+    homeViewModel: HomeViewModel
+) {
     Box(
         modifier = Modifier
             .width(170.dp)
@@ -221,14 +252,14 @@ fun GridItem(item: Product, navHostController: NavHostController, passedBrandNam
         val painter =
             rememberAsyncImagePainter(
                 ImageRequest.Builder // Placeholder image resource
-            // Image to show in case of loading failure
-                (LocalContext.current).data(data = item.productImage)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    placeholder(ImagesConst.appLogo)
-                    error(ImagesConst.appLogo)
-                    size(Size.ORIGINAL)
-                }).build()
+                // Image to show in case of loading failure
+                    (LocalContext.current).data(data = item.productImage)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        crossfade(true)
+                        placeholder(ImagesConst.appLogo)
+                        error(ImagesConst.appLogo)
+                        size(Size.ORIGINAL)
+                    }).build()
             )
 
         Image(
