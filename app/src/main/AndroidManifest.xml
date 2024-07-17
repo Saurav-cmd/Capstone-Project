@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BoozeBuddy"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAJFdFJ_Vsg-308qfLqSu3622-TZ4T9xHE" />
         <activity
             android:name="com.saurav.BoozeBuddyApplication"
             android:exported="false" />

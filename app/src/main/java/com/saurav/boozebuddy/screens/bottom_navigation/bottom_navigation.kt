@@ -20,6 +20,7 @@ import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.utils.noRippleClickable
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.screens.home.HomePage
+import com.saurav.boozebuddy.screens.near_by_location.NearByLocationScreen
 import com.saurav.boozebuddy.screens.notification.NotificationPage
 import com.saurav.boozebuddy.screens.profile.ProfilePage
 import com.saurav.boozebuddy.screens.wishlist.WishListPage
@@ -29,14 +30,24 @@ import com.saurav.boozebuddy.view_models.HomeViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 
 @Composable
-fun BottomNavigationBarMain(navController: NavHostController, authViewModel: AuthViewModel, homeViewModel: HomeViewModel, wishlistViewModel: WishlistViewModel) {
+fun BottomNavigationBarMain(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+    homeViewModel: HomeViewModel,
+    wishlistViewModel: WishlistViewModel
+) {
     AnimatedNavBar(navController, authViewModel, homeViewModel, wishlistViewModel)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AnimatedNavBar(navController: NavHostController,  authViewModel: AuthViewModel, homeViewModel: HomeViewModel, wishlistViewModel: WishlistViewModel) {
+private fun AnimatedNavBar(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+    homeViewModel: HomeViewModel,
+    wishlistViewModel: WishlistViewModel
+) {
     val navigationBarItems = remember { NavigationBarItems.values() }
     var selectedIndex by remember { mutableStateOf(0) }
     homeViewModel.fetchUserInfo()
@@ -75,15 +86,19 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
                 0 -> {
                     HomePage(navController, homeViewModel)
                 }
+
                 1 -> {
                     NotificationPage()
                 }
-//                2 -> {
-//                    CartPage()
-//                }
+
                 2 -> {
                     WishListPage(wishlistViewModel, navController)
                 }
+
+                3 -> {
+                    NearByLocationScreen()
+                }
+
                 else -> {
                     ProfilePage(authViewModel, navController, homeViewModel)
                 }
@@ -95,7 +110,7 @@ private fun AnimatedNavBar(navController: NavHostController,  authViewModel: Aut
 enum class NavigationBarItems(val icon: ImageVector) {
     Home(icon = Icons.Default.Home),
     Notification(icon = Icons.Default.Notifications),
-//    Cart(icon = Icons.Default.ShoppingCart),
     Wish(icon = Icons.Default.Favorite),
+    NearBy(icon = Icons.Default.LocationOn),
     Person(icon = Icons.Default.Person),
 }
