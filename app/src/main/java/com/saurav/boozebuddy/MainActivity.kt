@@ -19,6 +19,7 @@ import com.saurav.boozebuddy.ui.theme.BoozeBuddyTheme
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
+import com.saurav.boozebuddy.view_models.ProfileViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
     private val favouritesViewModel: FavouritesViewModel by viewModels()
     private val wishlistViewModel: WishlistViewModel by viewModels()
+    private val profileViewModel: ProfileViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNotificationPermission()
@@ -37,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = colors.primary,
                 ) {
-                   MyApp(authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel)
+                   MyApp(authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel, profileViewModel)
                 }
             }
         }
@@ -65,8 +67,9 @@ fun MyApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     favouritesViewModel: FavouritesViewModel,
-    wishlistViewModel: WishlistViewModel
+    wishlistViewModel: WishlistViewModel,
+    profileViewModel: ProfileViewModel
 ) {
     val navController = rememberNavController()
-    NavGraph.Setup(navController = navController, authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel)
+    NavGraph.Setup(navController = navController, authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel, profileViewModel)
 }

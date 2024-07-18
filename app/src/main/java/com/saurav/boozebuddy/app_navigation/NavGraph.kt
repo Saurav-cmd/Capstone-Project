@@ -21,6 +21,7 @@ import com.saurav.boozebuddy.screens.wishlist.WishlistProductListingPage
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
+import com.saurav.boozebuddy.view_models.ProfileViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 
 object NavGraph {
@@ -30,13 +31,14 @@ object NavGraph {
         authViewModel: AuthViewModel,
         homeViewModel: HomeViewModel,
         favouritesViewModel: FavouritesViewModel,
-        wishlistViewModel: WishlistViewModel
+        wishlistViewModel: WishlistViewModel,
+        profileViewModel: ProfileViewModel
     ) {
         NavHost(navController = navController, startDestination = NavRoute.Splash.route) {
             composable(NavRoute.Splash.route) { SplashScreen(navController, authViewModel) }
             composable(NavRoute.Login.route) { LoginPage(navController, authViewModel) }
             composable(NavRoute.SignUp.route) { SignupPage(navController, authViewModel) }
-            composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel, wishlistViewModel) }
+            composable(NavRoute.BottomNavigation.route) { BottomNavigationBarMain(navController, authViewModel, homeViewModel, wishlistViewModel, profileViewModel) }
             composable(NavRoute.FavouritesListing.route) { FavouritesListPage(navController, favouritesViewModel) }
             composable(NavRoute.ProductListing.route + "/{products}/{brandName}/{brandId}") { backStackEntry ->
                 val productsJson = backStackEntry.arguments?.getString("products")

@@ -2,6 +2,7 @@
 
 package com.saurav.boozebuddy.screens.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -21,9 +22,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -66,9 +68,15 @@ import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
+import com.saurav.boozebuddy.view_models.ProfileViewModel
 
 @Composable
-fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostController, homeViewModel: HomeViewModel) {
+fun ProfilePage(
+    authViewModel: AuthViewModel,
+    navHostController: NavHostController,
+    homeViewModel: HomeViewModel,
+    profileViewModel: ProfileViewModel
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +89,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navHostController: NavHostControll
         }
         item {
             Spacer(modifier = Modifier.height(10.dp))
-            BottomContainer(authViewModel, navHostController, homeViewModel)
+            BottomContainer(authViewModel, navHostController, homeViewModel, profileViewModel)
         }
     }
 }
@@ -148,7 +156,7 @@ private fun TopContainer(homeViewModel: HomeViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        if(isLoading){
+        if (isLoading) {
             Text(
                 text = "Loading...",
                 style = TextStyle(
@@ -159,7 +167,7 @@ private fun TopContainer(homeViewModel: HomeViewModel) {
                 ),
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
-        }else{
+        } else {
             Text(
                 text = userInfo.name.replaceFirstChar { it.uppercase() },
                 style = TextStyle(
@@ -182,38 +190,62 @@ private fun TopContainer(homeViewModel: HomeViewModel) {
             ),
             modifier = Modifier.padding(horizontal = 20.dp)
         )*/
-      /*  Spacer(modifier = Modifier.height(5.dp))
-        Text(
-            text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-            style = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W400,
-                textAlign = TextAlign.Center,
-                color = colors.secondary
-            ),
-            modifier = Modifier.padding(horizontal = 30.dp)
-        )*/
+        /*  Spacer(modifier = Modifier.height(5.dp))
+          Text(
+              text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+              style = TextStyle(
+                  fontSize = 14.sp,
+                  fontWeight = FontWeight.W400,
+                  textAlign = TextAlign.Center,
+                  color = colors.secondary
+              ),
+              modifier = Modifier.padding(horizontal = 30.dp)
+          )*/
     }
 }
 
 
 @Composable
-fun BottomContainer( authViewModel: AuthViewModel, navHostController: NavHostController, homeViewModel: HomeViewModel) {
+fun BottomContainer(
+    authViewModel: AuthViewModel,
+    navHostController: NavHostController,
+    homeViewModel: HomeViewModel,
+    profileViewModel: ProfileViewModel
+) {
     var showDialog by remember {
         mutableStateOf(false)
     }
+    var showClearDataDialogue by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        BottomContainerDesign(Icons.Default.Info, "Information",  colors.secondary, "Help and Support",color = Color.Black) {
-            //call the function here
-        }
-        BottomContainerDesign(Icons.Default.Settings, "Settings",  colors.secondary, "Settings",color = Color.Black) {
-            //call the function here
-        }
+//        BottomContainerDesign(Icons.Default.Info, "Information",  colors.secondary, "Help and Support",color = Color.Black) {
+//            //call the function here
+//        }
+//        BottomContainerDesign(Icons.Default.Settings, "Settings",  colors.secondary, "Settings",color = Color.Black) {
+//            //call the function here
+//        }
 
-        BottomContainerDesign(Icons.Default.Info, "App Info", colors.secondary, "App Info", color = Color.Black) {
+        BottomContainerDesign(
+            Icons.Default.Info,
+            "App Info",
+            colors.secondary,
+            "App Info",
+            color = Color.Black
+        ) {
             //call the function here
+        }
+        BottomContainerDesign(
+            Icons.Default.Clear,
+            "Clear Data",
+            errorColor,
+            "Clear All Data",
+            color = errorColor
+        ) {
+            showClearDataDialogue = true
         }
         BottomContainerDesign(
             Icons.Default.Lock,
@@ -225,7 +257,19 @@ fun BottomContainer( authViewModel: AuthViewModel, navHostController: NavHostCon
             showDialog = true
         }
         if (showDialog) {
-            LogoutDialog(onDismiss = { showDialog = false }, authViewModel = authViewModel,navHostController, homeViewModel)
+            LogoutDialog(
+                onDismiss = { showDialog = false },
+                authViewModel = authViewModel,
+                navHostController,
+                homeViewModel
+            )
+        }
+        if (showClearDataDialogue) {
+            ClearDataDialog(
+                onDismiss = { showClearDataDialogue = false },
+                profileViewModel,
+                navHostController = navHostController,
+            )
         }
     }
 }
@@ -274,45 +318,118 @@ fun BottomContainerDesign(
 
 
 @Composable
-fun LogoutDialog(onDismiss: () -> Unit, authViewModel: AuthViewModel, navHostController: NavHostController, homeViewModel: HomeViewModel) {
+fun LogoutDialog(
+    onDismiss: () -> Unit,
+    authViewModel: AuthViewModel,
+    navHostController: NavHostController,
+    homeViewModel: HomeViewModel
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
         confirmButton = {
-            Button(onClick = {
-                authViewModel.logOutUser().run {
-                    navHostController.navigate(NavRoute.Login.route){
-                        popUpTo(NavRoute.BottomNavigation.route) { inclusive = true }
+            Button(
+                onClick = {
+                    authViewModel.logOutUser().run {
+                        navHostController.navigate(NavRoute.Login.route) {
+                            popUpTo(NavRoute.BottomNavigation.route) { inclusive = true }
+                        }
                     }
-                }
-                homeViewModel.setLoggedInState(false)
-                // Dismiss the dialog after logging out
-                onDismiss()
-            }, colors = ButtonDefaults.buttonColors(
-                containerColor = secondaryColor,
-                contentColor = primaryColor
-            ),) {
-                if(authViewModel.isLoggingOut.value){
+                    homeViewModel.setLoggedInState(false)
+                    // Dismiss the dialog after logging out
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = secondaryColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                if (authViewModel.isLoggingOut.value) {
                     CircularProgressIndicator()
-                }else{
-                    Text(text = "Yes",)
+                } else {
+                    Text(text = "Yes")
                 }
 
             }
         },
         dismissButton = {
-            Button(onClick = {
-                onDismiss()
-            },  colors = ButtonDefaults.buttonColors(
-                containerColor = errorColor,
-                contentColor = primaryColor
-            ),) {
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = errorColor,
+                    contentColor = primaryColor
+                ),
+            ) {
                 Text(text = "No")
             }
         },
         title = {
-            Text(text = "Are you sure you want to logout?", textAlign = TextAlign.Center, color = errorColor)
+            Text(
+                text = "Are you sure you want to logout?",
+                textAlign = TextAlign.Center,
+                color = errorColor
+            )
         },
     )
 }
 
+@Composable
+fun ClearDataDialog(
+    onDismiss: () -> Unit,
+    profileViewModel: ProfileViewModel,
+    navHostController: NavHostController,
+) {
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                onClick = {
+                    profileViewModel.deleteAllData { success, errMsg ->
+                        if(success){
+                            Toast.makeText(context, "Successfully Deleted", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(context, "Error Occurred: $errMsg", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    // Dismiss the dialog after logging out
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = secondaryColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                if (profileViewModel.isDeletingAllData.value == true) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = "Yes")
+                }
+
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = errorColor,
+                    contentColor = primaryColor
+                ),
+            ) {
+                Text(text = "No")
+            }
+        },
+        title = {
+            Text(
+                text = "Are you sure you want to clear all data?",
+                textAlign = TextAlign.Center,
+                color = errorColor
+            )
+        },
+    )
+}

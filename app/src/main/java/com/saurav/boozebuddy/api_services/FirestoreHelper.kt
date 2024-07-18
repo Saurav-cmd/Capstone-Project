@@ -7,6 +7,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saurav.boozebuddy.models.BannerModel
 import com.saurav.boozebuddy.models.BrandModel
@@ -330,4 +332,61 @@ class FirestoreHelper(
         }
     }
 
+    suspend fun clearAllAppData(callback: (Boolean, String?) -> Unit) {
+        try {
+            val currentUser = auth.currentUser ?: throw Exception("Not logged in or user not found")
+            val uid = currentUser.uid
+
+            // Get references to the user's collections
+            val userRef = firestore.collection("users").document(uid)
+            val wishListCollection = userRef.collection("wishlist").document()
+            val favouritesCollection = userRef.collection("favourites")
+
+            // Delete documents in 'wishlist' collection and its subcollections
+            val wishListDeleteResult = deleteDocumentAndSubcollections(wishListCollection)
+
+            // Delete documents in 'favourites' collection
+            val favouritesDeleteResult = deleteCollection(favouritesCollection)
+            if (!favouritesDeleteResult) {
+                callback(false, "Failed to delete favourites")
+                return
+            }
+
+            callback(true, "Collections deleted successfully")
+        } catch (e: Exception) {
+            callback(false, e.message)
+        }
+    }
+
+
+    // Helper function to delete a collection
+    private suspend fun deleteCollection(collection: CollectionReference): Boolean {
+        return try {
+            // Get all documents in the collection
+            val querySnapshot = collection.get().await()
+
+            // Delete each document
+            for (document in querySnapshot.documents) {
+                document.reference.delete().await()
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Helper function to delete a document and its subcollections recursively
+    private suspend fun deleteDocumentAndSubcollections(documentRef: DocumentReference) {
+        try {
+            // Delete subcollections (not supported directly, so you need to know their paths)
+            // For instance, if you know the path to subcollections, delete them accordingly.
+            // Example: documentRef.collection("subcollectionName").get().await()
+
+            // Delete the document itself
+            documentRef.delete().await()
+        } catch (e: Exception) {
+            // Handle error if needed
+        }
+    }
 }
+
