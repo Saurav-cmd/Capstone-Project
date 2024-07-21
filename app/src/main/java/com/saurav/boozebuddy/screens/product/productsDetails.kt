@@ -1,6 +1,7 @@
 package com.saurav.boozebuddy.screens.product
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -31,6 +32,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -39,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -59,19 +62,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
+import androidx.work.*
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.saurav.boozebuddy.constants.ImagesConst
 import com.saurav.boozebuddy.constants.ThemeUtils.colors
 import com.saurav.boozebuddy.models.Product
+import com.saurav.boozebuddy.notification_service.ScheduleNotification
 import com.saurav.boozebuddy.ui.theme.errorColor
 import com.saurav.boozebuddy.ui.theme.lightGrey
 import com.saurav.boozebuddy.ui.theme.primaryColor
 import com.saurav.boozebuddy.ui.theme.secondaryColor
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
-import java.util.Locale
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.time.timepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -381,6 +395,7 @@ fun AddWishListButton(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WishListDialog(
     onDismiss: () -> Unit,
@@ -399,6 +414,35 @@ fun WishListDialog(
 
     // State variable to track selected wishlist item
     var selectedWishlistIndex by remember { mutableStateOf(-1) }
+
+    //State variable of date and time
+    var pickedDate by remember {
+        mutableStateOf(LocalDate.now())
+    }
+
+    var pickedTime by remember{
+        mutableStateOf(LocalTime.now())
+    }
+
+    //we are using derivedStateOf is because we do format with another state that will be our pickedDate so it is derived
+    val formattedDate by remember{
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("MMM dd yyyy").format(pickedDate)
+        }
+    }
+
+    val formattedTime by remember{
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("hh:mm a").format(pickedTime)
+        }
+    }
+
+    val dateDialogueState = rememberMaterialDialogState()
+    val timeDialogueState =  rememberMaterialDialogState()
+
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -421,8 +465,17 @@ fun WishListDialog(
                                 productInfo.productId,
                                 brandId ?: "",
                                 productInfo,
+                                formattedDate,
+                                formattedTime
                             ) { success, errMsg ->
                                 if (success) {
+                                    scheduleLocalNotification(
+                                        date = formattedDate,
+                                        time = formattedTime,
+                                        title = "Reminder (Wishlist)",
+                                        message = wishlistName,
+                                        context = context
+                                    )
                                     Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
                                     wishlistViewModel.fetchWishlist()
                                 } else {
@@ -443,8 +496,17 @@ fun WishListDialog(
                             productInfo.productId,
                             brandId ?: "",
                             productInfo,
+                            formattedDate,
+                            formattedTime
                         ) { success, errMsg ->
                             if (success) {
+                                scheduleLocalNotification(
+                                    date = formattedDate,
+                                    time = formattedTime,
+                                    title = "Reminder (Wishlist)",
+                                    message = selectedWishlist.wishName,
+                                    context = context
+                                )
                                 Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
                                 wishlistViewModel.fetchWishlist()
                             } else {
@@ -501,6 +563,70 @@ fun WishListDialog(
                         }
                     }
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Button(
+                            onClick = {
+                                dateDialogueState.show()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = secondaryColor,
+                                contentColor = primaryColor
+                            ),
+                        ) {
+                            Text(text = "Pick date")
+                        }
+                        Text(text = formattedDate, fontSize = 16.sp)
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Button(
+                            onClick = {
+                                timeDialogueState.show()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = secondaryColor,
+                                contentColor = primaryColor
+                            ),
+                        ) {
+                            Text(text = "Pick time")
+                        }
+                        Text(text = formattedTime, fontSize = 16.sp)
+                    }
+                }
+                MaterialDialog(
+                    dialogState = dateDialogueState,
+                    buttons = {
+                        positiveButton(text = "OK")
+                        negativeButton(text = "Cancel")
+                    }
+                ) {
+                    datepicker(
+                        initialDate = LocalDate.now(),
+                        title = "pick date",
+                    ){
+                        pickedDate = it
+                    }
+                }
+                MaterialDialog(
+                    dialogState = timeDialogueState,
+                    buttons = {
+                        positiveButton(text = "OK")
+                        negativeButton(text = "Cancel")
+                    }
+                ) {
+                    timepicker(
+                        initialTime = LocalTime.now(),
+                        title = "pick time",
+                    ){
+                        pickedTime = it
+                    }
+                }
                 Spacer(modifier = Modifier.height(15.dp))
                 Text(
                     text = "Or",
@@ -572,6 +698,32 @@ fun WishListDialog(
     )
 }
 
+fun scheduleLocalNotification(date: String, time: String, title: String, message: String, context: Context) {
+    Log.d("Notification Time", "Schedule notification call")
+    val notificationTime = calculateNotificationTime(date, time)
+    Log.d("Notification Time", "$notificationTime $title $message")
+    val data = Data.Builder()
+        .putString("title", title)
+        .putString("message", message)
+        .build()
+
+    val delay = notificationTime - System.currentTimeMillis()
+
+    val workRequest = OneTimeWorkRequestBuilder<ScheduleNotification>()
+        .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+        .setInputData(data)
+        .build()
+
+    WorkManager.getInstance(context).enqueue(workRequest)
+}
+
+fun calculateNotificationTime(date: String, time: String): Long {
+    val dateFormat = SimpleDateFormat("MMM dd yyyy hh:mm a", Locale.getDefault())
+    val dateTimeString = "$date $time"
+    val parsedDate = dateFormat.parse(dateTimeString)
+    Log.d("Notification Time", "${parsedDate?.time} ${parsedDate}")
+    return parsedDate?.time ?: System.currentTimeMillis()
+}
 
 
 

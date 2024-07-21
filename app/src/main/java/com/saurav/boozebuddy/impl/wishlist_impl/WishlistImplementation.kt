@@ -17,6 +17,8 @@ class WishlistImplementation @Inject constructor(val firestoreHelper: FirestoreH
         productId: String,
         brandId: String,
         product: Product,
+        dateStamp:String,
+        timeStamp: String,
         callback: (Boolean, String?) -> Unit
     ) {
         firestoreHelper.storeUserWishlist(
@@ -27,7 +29,9 @@ class WishlistImplementation @Inject constructor(val firestoreHelper: FirestoreH
             brandName,
             productId,
             brandId,
-            product
+            product,
+            dateStamp,
+            timeStamp,
         ) { success, errMsg ->
             callback(success, errMsg)
         }

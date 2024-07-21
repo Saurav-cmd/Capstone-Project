@@ -42,6 +42,8 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
         productId: String,
         brandId: String,
         product: Product,
+        dateStamp: String,
+        timeStamp: String,
         callback: (Boolean, String?) -> Unit
     ) {
         try {
@@ -56,7 +58,9 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
                         brandName,
                         productId,
                         brandId,
-                        product
+                        product,
+                        dateStamp,
+                        timeStamp
                     ) { success, errMsg ->
                         callback(success, errMsg)
                     }

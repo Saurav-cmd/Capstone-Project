@@ -107,12 +107,20 @@ dependencies {
     implementation("com.google.firebase:firebase-database:21.0.0")
 
     //for caruosel slider of the banner
-    implementation("com.google.accompanist:accompanist-pager:0.24.10-beta")
+    implementation("com.google.accompanist:accompanist-pager:0.24.13-rc")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.24.10-beta")
 
     //Google map
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.maps.android:maps-compose:2.7.2")
+
+    //Date Time
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    //schedule notification
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
 }
 
 kapt {

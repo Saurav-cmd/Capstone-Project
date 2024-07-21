@@ -149,7 +149,8 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
                 Text(
                     data.wishName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
                     color = colors.secondary,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    modifier = Modifier.fillMaxWidth(0.9f)
                 )
                if(isDeletingWishList){
                    CircularProgressIndicator(

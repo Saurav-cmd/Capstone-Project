@@ -13,6 +13,8 @@ interface WishlistInterface {
         productId: String,
         brandId: String,
         product: Product,
+        dateStamp: String,
+        timeStamp:String,
         callback: (Boolean, String?) -> Unit
     )
 

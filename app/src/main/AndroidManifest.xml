@@ -20,8 +20,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAJFdFJ_Vsg-308qfLqSu3622-TZ4T9xHE" />
+        <meta-data
+            android:name="androidx.work.WorkManagerInitializer"
+            android:value="com.saurav.boozebuddy.MyInitializer" />
         <activity
-            android:name="com.saurav.BoozeBuddyApplication"
+            android:name="com.saurav.boozebuddy.BoozeBuddyApplication"
             android:exported="false" />
         <activity
             android:name="com.saurav.MyApp"

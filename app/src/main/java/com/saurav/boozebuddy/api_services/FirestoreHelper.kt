@@ -183,6 +183,8 @@ class FirestoreHelper(
         productId: String,
         brandId: String,
         product: Product,
+        dateStamp:String,
+        timeStamp: String,
         callback: (Boolean, String?) -> Unit
     ) {
         try {
@@ -221,7 +223,9 @@ class FirestoreHelper(
                 "productABV" to product.productABV,
                 "productVolume" to product.productVolume,
                 "productOrigin" to product.productOrigin,
-                "productIngredients" to product.productIngredients
+                "productIngredients" to product.productIngredients,
+                "dateStamp" to dateStamp,
+                "timeStamp" to timeStamp
             )
 
             // Add productData under folderName inside the wishlistItemId
