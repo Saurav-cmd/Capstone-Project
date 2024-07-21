@@ -1,7 +1,6 @@
 package com.saurav.boozebuddy.api_services
 
 import android.util.Log
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -339,16 +338,17 @@ class FirestoreHelper(
 
             // Get references to the user's collections
             val userRef = firestore.collection("users").document(uid)
-            val wishListCollection = userRef.collection("wishlist").document()
+            val wishListCollection = userRef.collection("wishlist")
             val favouritesCollection = userRef.collection("favourites")
 
             // Delete documents in 'wishlist' collection and its subcollections
-            val wishListDeleteResult = deleteDocumentAndSubcollections(wishListCollection)
+            val wishListDeleteResult = deleteCollectionRecursively(wishListCollection)
 
-            // Delete documents in 'favourites' collection
-            val favouritesDeleteResult = deleteCollection(favouritesCollection)
-            if (!favouritesDeleteResult) {
-                callback(false, "Failed to delete favourites")
+            // Delete documents in 'favourites' collection and its subcollections
+            val favouritesDeleteResult = deleteCollectionRecursively(favouritesCollection)
+
+            if (!wishListDeleteResult || !favouritesDeleteResult) {
+                callback(false, "Failed to delete wishlist or favourites")
                 return
             }
 
@@ -358,16 +358,15 @@ class FirestoreHelper(
         }
     }
 
-
-    // Helper function to delete a collection
-    private suspend fun deleteCollection(collection: CollectionReference): Boolean {
+    // Helper function to delete a collection recursively
+    private suspend fun deleteCollectionRecursively(collection: CollectionReference): Boolean {
         return try {
             // Get all documents in the collection
             val querySnapshot = collection.get().await()
 
-            // Delete each document
+            // Delete each document and its subcollections
             for (document in querySnapshot.documents) {
-                document.reference.delete().await()
+                deleteDocumentAndSubcollections(document.reference)
             }
             true
         } catch (e: Exception) {
@@ -378,9 +377,11 @@ class FirestoreHelper(
     // Helper function to delete a document and its subcollections recursively
     private suspend fun deleteDocumentAndSubcollections(documentRef: DocumentReference) {
         try {
-            // Delete subcollections (not supported directly, so you need to know their paths)
-            // For instance, if you know the path to subcollections, delete them accordingly.
-            // Example: documentRef.collection("subcollectionName").get().await()
+            // Recursively delete all subcollections
+            val subCollections = documentRef.listSubCollections()
+            for (subCollection in subCollections) {
+                deleteCollectionRecursively(subCollection)
+            }
 
             // Delete the document itself
             documentRef.delete().await()
@@ -388,5 +389,16 @@ class FirestoreHelper(
             // Handle error if needed
         }
     }
+
+    // Extension function to list subcollections of a document
+    private suspend fun DocumentReference.listSubCollections(): List<CollectionReference> {
+        return try {
+            firestore.collection(this.path).get().await().map { it.reference.collection(it.id) }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+
 }
 
