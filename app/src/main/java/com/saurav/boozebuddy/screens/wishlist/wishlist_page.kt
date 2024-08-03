@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,7 +60,7 @@ import java.util.Locale
 
 @Composable
 fun WishListPage(wishlistViewModel: WishlistViewModel, navHostController: NavHostController) {
-
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         wishlistViewModel.fetchWishlist()
     }
@@ -69,12 +70,31 @@ fun WishListPage(wishlistViewModel: WishlistViewModel, navHostController: NavHos
 
     Scaffold(
         topBar = {
-            TopContainer()
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TopContainer()
+                TextButton(onClick = {
+                    val formattedWishlist =wishlistViewModel.formatWishlistForSharing(wishListData)
+                    wishlistViewModel.shareWishlist(context, formattedWishlist)
+                }) {
+                    Text(
+                        text = "Share",
+                        style = TextStyle(
+                            color = colors.secondary,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.W500
+                        )
+                    )
+                }
+            }
         }
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize().padding(it)
+                .fillMaxSize()
+                .padding(it)
                 .navigationBarsPadding() // Automatically adds padding for the bottom navigation bar
                 .imePadding(), // Adds padding for the on-screen keyboard if needed
         ) {
@@ -98,7 +118,11 @@ fun WishListPage(wishlistViewModel: WishlistViewModel, navHostController: NavHos
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "No Wishlist to show", color = errorColor, textAlign = TextAlign.Center)
+                    Text(
+                        text = "No Wishlist to show",
+                        color = errorColor,
+                        textAlign = TextAlign.Center
+                    )
                 }
             } else {
                 DetailContainer(wishListData, wishlistViewModel, navHostController)
@@ -112,7 +136,9 @@ fun WishListPage(wishlistViewModel: WishlistViewModel, navHostController: NavHos
 private fun TopContainer() {
     Text(
         text = "WishList",
-        modifier = Modifier.padding(horizontal = 20.dp).padding(top = 10.dp),
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .padding(top = 10.dp),
         style = TextStyle(
             color = colors.secondary,
             fontSize = 18.sp,
@@ -122,7 +148,11 @@ private fun TopContainer() {
 }
 
 @Composable
-private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel: WishlistViewModel, navHostController: NavHostController) {
+private fun DetailContainer(
+    wishListData: List<WishlistModel>,
+    wishlistViewModel: WishlistViewModel,
+    navHostController: NavHostController
+) {
     val isDeletingWishList by wishlistViewModel.isDeletingWishList.observeAsState(initial = false)
     var showDialog by remember {
         mutableStateOf(false)
@@ -152,27 +182,31 @@ private fun DetailContainer(wishListData: List<WishlistModel>, wishlistViewModel
                     fontSize = 18.sp,
                     modifier = Modifier.fillMaxWidth(0.9f)
                 )
-               if(isDeletingWishList){
-                   CircularProgressIndicator(
-                       color = secondaryColor
-                   )
-               }else {
-                   IconButton(onClick = {
-                       showDialog = true
-                   }) {
-                       Icon(
-                           imageVector = Icons.Default.Delete,
-                           contentDescription = "Delete",
-                           tint = Color.Red
-                       )
-                   }
-               }
+                if (isDeletingWishList) {
+                    CircularProgressIndicator(
+                        color = secondaryColor
+                    )
+                } else {
+                    IconButton(onClick = {
+                        showDialog = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
+                }
             }
             Divider()
 
 
             if (showDialog) {
-                DeleteDialog(onDismiss = { showDialog = false }, wishlistViewModel = wishlistViewModel, data.wishId)
+                DeleteDialog(
+                    onDismiss = { showDialog = false },
+                    wishlistViewModel = wishlistViewModel,
+                    data.wishId
+                )
             }
         }
     }
@@ -197,10 +231,14 @@ private fun DeleteDialog(
                             Toast
                                 .makeText(context, "Successfully deleted", Toast.LENGTH_SHORT)
                                 .show()
-                           wishlistViewModel.fetchWishlist()
+                            wishlistViewModel.fetchWishlist()
                         } else {
                             Toast
-                                .makeText(context, "Error cannot delete $errMsg", Toast.LENGTH_SHORT)
+                                .makeText(
+                                    context,
+                                    "Error cannot delete $errMsg",
+                                    Toast.LENGTH_SHORT
+                                )
                                 .show()
                         }
                     }

@@ -1,5 +1,7 @@
 package com.saurav.boozebuddy.view_models
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -123,5 +125,30 @@ class WishlistViewModel @Inject constructor(private val wishlistImplementation: 
         }
     }
 
+
+    fun formatWishlistForSharing(wishListData: List<WishlistModel>): String {
+        val wishlistStringBuilder = StringBuilder()
+        for (wishlist in wishListData) {
+            wishlistStringBuilder.append("Folder: ${wishlist.wishName}\n")
+            for (product in wishlist.wishListProducts) {
+                wishlistStringBuilder.append("Product: ${product.productName}\n")
+                wishlistStringBuilder.append("Brand: ${product.brandName}\n")
+                wishlistStringBuilder.append("Description: ${product.productDescription}\n")
+                wishlistStringBuilder.append("\n")
+            }
+            wishlistStringBuilder.append("\n")
+        }
+        return wishlistStringBuilder.toString()
+    }
+
+
+    fun shareWishlist(context: Context, wishlist: String) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, wishlist)
+            type = "text/plain"
+        }
+        context.startActivity(Intent.createChooser(shareIntent, "Share wishlist via"))
+    }
 
 }
