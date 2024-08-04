@@ -1,4 +1,5 @@
 package com.saurav.boozebuddy
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -19,6 +20,7 @@ import com.saurav.boozebuddy.ui.theme.BoozeBuddyTheme
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.FavouritesViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
+import com.saurav.boozebuddy.view_models.NearByLocationViewModel
 import com.saurav.boozebuddy.view_models.ProfileViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
     private val favouritesViewModel: FavouritesViewModel by viewModels()
     private val wishlistViewModel: WishlistViewModel by viewModels()
     private val profileViewModel: ProfileViewModel by viewModels()
+    private val nearByLocationViewModel: NearByLocationViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNotificationPermission()
@@ -39,13 +42,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = colors.primary,
                 ) {
-                   MyApp(authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel, profileViewModel)
+                    MyApp(
+                        authViewModel,
+                        homeViewModel,
+                        favouritesViewModel,
+                        wishlistViewModel,
+                        profileViewModel,
+                        nearByLocationViewModel
+                    )
                 }
             }
         }
     }
 
-    private fun requestNotificationPermission(){
+    private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val hasPermission = ContextCompat.checkSelfPermission(
                 this,
@@ -68,8 +78,17 @@ fun MyApp(
     homeViewModel: HomeViewModel,
     favouritesViewModel: FavouritesViewModel,
     wishlistViewModel: WishlistViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    nearByLocationViewModel: NearByLocationViewModel
 ) {
     val navController = rememberNavController()
-    NavGraph.Setup(navController = navController, authViewModel, homeViewModel, favouritesViewModel, wishlistViewModel, profileViewModel)
+    NavGraph.Setup(
+        navController = navController,
+        authViewModel,
+        homeViewModel,
+        favouritesViewModel,
+        wishlistViewModel,
+        profileViewModel,
+        nearByLocationViewModel
+    )
 }

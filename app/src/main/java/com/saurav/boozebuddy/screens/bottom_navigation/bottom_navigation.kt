@@ -27,6 +27,7 @@ import com.saurav.boozebuddy.screens.wishlist.WishListPage
 import com.saurav.boozebuddy.ui.theme.bottomNavUnSelectedIconColor
 import com.saurav.boozebuddy.view_models.AuthViewModel
 import com.saurav.boozebuddy.view_models.HomeViewModel
+import com.saurav.boozebuddy.view_models.NearByLocationViewModel
 import com.saurav.boozebuddy.view_models.ProfileViewModel
 import com.saurav.boozebuddy.view_models.WishlistViewModel
 
@@ -36,9 +37,10 @@ fun BottomNavigationBarMain(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     wishlistViewModel: WishlistViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    nearByLocationViewModel: NearByLocationViewModel
 ) {
-    AnimatedNavBar(navController, authViewModel, homeViewModel, wishlistViewModel, profileViewModel)
+    AnimatedNavBar(navController, authViewModel, homeViewModel, wishlistViewModel, profileViewModel,nearByLocationViewModel)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -49,7 +51,8 @@ private fun AnimatedNavBar(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     wishlistViewModel: WishlistViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    nearByLocationViewModel: NearByLocationViewModel
 ) {
     val navigationBarItems = remember { NavigationBarItems.values() }
     var selectedIndex by remember { mutableStateOf(0) }
@@ -99,7 +102,7 @@ private fun AnimatedNavBar(
                 }
 
                 3 -> {
-                    NearByLocationScreen()
+                    NearByLocationScreen(nearByLocationViewModel)
                 }
 
                 else -> {

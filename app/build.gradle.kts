@@ -25,6 +25,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = "boozebuddykey"
+            keyPassword = "saurav"
+            storeFile = file("/Users/sauravadhikari/Documents/boozebuddy.keystore")
+            storePassword = "your-keystore-password" // Replace with your actual store password
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -79,6 +88,7 @@ dependencies {
     implementation("androidx.datastore:datastore-core-android:1.1.1")
     implementation("com.google.firebase:firebase-messaging-ktx:24.0.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.android.gms:play-services-places:17.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -120,6 +130,11 @@ dependencies {
 
     //schedule notification
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    //show places in google map
+    implementation("com.google.android.libraries.places:places:3.5.0")
+
+
 
 }
 
